@@ -12,6 +12,8 @@
 
 #include <stdint.h>
 
+#include <type_traits>
+
 /**************************************************************************************
  * NAMESPACE
  **************************************************************************************/
@@ -82,6 +84,16 @@ enum class Register : uint8_t
   ID                     = 0xE3,
   REVID                  = 0xE4,
 };
+
+/**************************************************************************************
+ * CONVERSION FUNCTIONS
+ **************************************************************************************/
+
+template <typename Enumeration>
+constexpr auto to_integer(Enumeration const value) -> typename std::underlying_type<Enumeration>::type
+{
+  return static_cast<typename std::underlying_type<Enumeration>::type>(value);
+}
 
 /**************************************************************************************
  * NAMESPACE
