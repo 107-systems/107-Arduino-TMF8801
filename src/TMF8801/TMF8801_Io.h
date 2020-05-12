@@ -27,10 +27,8 @@ namespace TMF8801
  * TYPEDEF
  **************************************************************************************/
 
-typedef std::function<void(uint8_t const)>                           I2cStartFunc;
-typedef std::function<void(uint8_t const)>                           I2cWriteFunc;
-typedef std::function<void()>                                        I2cStopFunc;
-typedef std::function<void(uint8_t const, uint8_t *, uint8_t const)> I2cRequestFromFunc;
+typedef std::function<void(uint8_t const, uint8_t const, uint8_t const *, uint8_t const)> I2cWriteFunc;
+typedef std::function<void(uint8_t const, uint8_t const, uint8_t       *, uint8_t const)> I2cReadFunc;
 
 /**************************************************************************************
  * CLASS DECLARATION
@@ -40,7 +38,7 @@ class TMF8801_Io
 {
 public:
 
-  TMF8801_Io(I2cStartFunc start, I2cWriteFunc write, I2cStopFunc stop, I2cRequestFromFunc request_from, uint8_t const i2c_slave_addr);
+  TMF8801_Io(I2cWriteFunc write, I2cReadFunc read, uint8_t const i2c_slave_addr);
 
 
   uint8_t read  (Register const reg);
@@ -49,10 +47,9 @@ public:
 
 private:
 
-  I2cStartFunc _start;
   I2cWriteFunc _write;
-  I2cStopFunc _stop;
-  I2cRequestFromFunc _request_from;
+  I2cReadFunc _read;
+
   uint8_t const _i2c_slave_addr;
 };
 
