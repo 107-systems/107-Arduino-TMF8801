@@ -3,11 +3,16 @@
  * @license LGPL 3.0
  */
 
+#ifndef ARDUINO_TMF8801_TMF8801_STATUS_H_
+#define ARDUINO_TMF8801_TMF8801_STATUS_H_
+
 /**************************************************************************************
  * INCLUDE
  **************************************************************************************/
 
 #include "TMF8801_Io.h"
+
+#include "TMF8801_Const.h"
 
 /**************************************************************************************
  * NAMESPACE
@@ -17,62 +22,45 @@ namespace TMF8801
 {
 
 /**************************************************************************************
- * CTOR/DTOR
+ * TYPEDEF
  **************************************************************************************/
 
-TMF8801_Io::TMF8801_Io(I2cWriteFunc write, I2cReadFunc read, uint8_t const i2c_slave_addr)
-: _write{write}
-, _read{read}
-, _i2c_slave_addr{i2c_slave_addr}
+enum class Application
 {
+  Unkown, Measurement, Bootloader
+};
 
-}
+enum class RegisterContent
+{
+  Unkown, CalibrationData, SerialNumber, CommandResult, RawHistogram
+};
 
 /**************************************************************************************
- * PUBLIC MEMBER FUNCTIONS
+ * CLASS DECLARATION
  **************************************************************************************/
 
-uint8_t TMF8801_Io::read(Register const reg)
+class TMF8801_Status
 {
-  uint8_t data = 0;
-  read(reg, &data, 1);
-  return data;
-}
 
-void TMF8801_Io::write(Register const reg, uint8_t const val)
-{
-  write(reg, &val, 1);
-}
+public:
 
-void TMF8801_Io::read(Register const reg, uint8_t * buf, size_t const bytes)
-{
-  _read(_i2c_slave_addr, to_integer(reg), buf, bytes);
-}
+  TMF8801_Status(TMF8801_Io & io);
 
-void TMF8801_Io::write(Register const reg, uint8_t const * buf, size_t const bytes)
-{
-  _write(_i2c_slave_addr, to_integer(reg), buf, bytes);
-}
+  bool            isCpuReady();
+  Application     currentApplication();
+  RegisterContent getRegisterContent();
 
-void TMF8801_Io::modify(Register const reg, uint8_t const bitmask, uint8_t const val)
-{
-  uint8_t reg_val = read(reg);
-  reg_val &= ~(bitmask);
-  reg_val |= (val & bitmask);
-  write(reg, reg_val);
-}
 
-bool TMF8801_Io::isBitSet(Register const reg, uint8_t const bitpos)
-{
-  uint8_t const reg_val = read(reg);
-  if (reg_val & (1<<bitpos))
-    return true;
-  else
-    return false;
-}
+private:
+
+  TMF8801_Io & _io;
+
+};
 
 /**************************************************************************************
  * NAMESPACE
  **************************************************************************************/
 
 } /* TMF8801 */
+
+#endif /* ARDUINO_TMF8801_TMF8801_STATUS_H_ */

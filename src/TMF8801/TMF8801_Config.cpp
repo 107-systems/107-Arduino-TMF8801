@@ -7,7 +7,9 @@
  * INCLUDE
  **************************************************************************************/
 
-#include "TMF8801_Io.h"
+#include "TMF8801_Config.h"
+
+#include "TMF8801_Const.h"
 
 /**************************************************************************************
  * NAMESPACE
@@ -20,10 +22,8 @@ namespace TMF8801
  * CTOR/DTOR
  **************************************************************************************/
 
-TMF8801_Io::TMF8801_Io(I2cWriteFunc write, I2cReadFunc read, uint8_t const i2c_slave_addr)
-: _write{write}
-, _read{read}
-, _i2c_slave_addr{i2c_slave_addr}
+TMF8801_Config::TMF8801_Config(TMF8801_Io & io)
+: _io{io}
 {
 
 }
@@ -32,43 +32,14 @@ TMF8801_Io::TMF8801_Io(I2cWriteFunc write, I2cReadFunc read, uint8_t const i2c_s
  * PUBLIC MEMBER FUNCTIONS
  **************************************************************************************/
 
-uint8_t TMF8801_Io::read(Register const reg)
+void TMF8801_Config::loadCalibData(CalibData const & calib_data)
 {
-  uint8_t data = 0;
-  read(reg, &data, 1);
-  return data;
+  _io.write(Register::FACTORY_CALIB_0, calib_data.data(), calib_data.size());
 }
 
-void TMF8801_Io::write(Register const reg, uint8_t const val)
+void TMF8801_Config::loadAlgoState(AlgoState const & algo_state)
 {
-  write(reg, &val, 1);
-}
-
-void TMF8801_Io::read(Register const reg, uint8_t * buf, size_t const bytes)
-{
-  _read(_i2c_slave_addr, to_integer(reg), buf, bytes);
-}
-
-void TMF8801_Io::write(Register const reg, uint8_t const * buf, size_t const bytes)
-{
-  _write(_i2c_slave_addr, to_integer(reg), buf, bytes);
-}
-
-void TMF8801_Io::modify(Register const reg, uint8_t const bitmask, uint8_t const val)
-{
-  uint8_t reg_val = read(reg);
-  reg_val &= ~(bitmask);
-  reg_val |= (val & bitmask);
-  write(reg, reg_val);
-}
-
-bool TMF8801_Io::isBitSet(Register const reg, uint8_t const bitpos)
-{
-  uint8_t const reg_val = read(reg);
-  if (reg_val & (1<<bitpos))
-    return true;
-  else
-    return false;
+  _io.write(Register::STATE_DATA_WR_0, algo_state.data(), algo_state.size());
 }
 
 /**************************************************************************************
