@@ -1,6 +1,8 @@
 /**
- * @brief Arduino library for interfacing with the TMF8801 time-of-flight distance sensor.
- * @license LGPL 3.0
+ * This software is distributed under the terms of the MIT License.
+ * Copyright (c) 2020 LXRobotics.
+ * Author: Alexander Entinger <alexander.entinger@lxrobotics.com>
+ * Contributors: https://github.com/107-systems/107-Arduino-TMF8801/graphs/contributors.
  */
 
 #ifndef ARDUINO_TMF8801_TMF8801_CONTROL_H_
