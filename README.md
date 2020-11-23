@@ -16,3 +16,11 @@ The following hardware items are required:
 <p align="center">
   <img src="extras/img/tmf8801-setup.jpg" width="40%">
 </p>
+
+| **Colour** | **Function** |
+|:----------:|:------------:|
+| Red        |    3V3       |
+| Black      |    GND       |
+| Green      |    INT       |
+| Yellow     |    SCL       |
+| Blue       |    SDA       |
