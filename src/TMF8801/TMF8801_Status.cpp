@@ -9,8 +9,8 @@
  * INCLUDE
  **************************************************************************************/
 
-#include "TMF8801_Io.h"
-
+#include "TMF8801_Status.h"
+#include <Arduino.h>
 /**************************************************************************************
  * NAMESPACE
  **************************************************************************************/
@@ -22,10 +22,8 @@ namespace TMF8801
  * CTOR/DTOR
  **************************************************************************************/
 
-TMF8801_Io::TMF8801_Io(I2cWriteFunc write, I2cReadFunc read, uint8_t const i2c_slave_addr)
-: _write{write}
-, _read{read}
-, _i2c_slave_addr{i2c_slave_addr}
+TMF8801_Status::TMF8801_Status(TMF8801_Io & io)
+: _io{io}
 {
 
 }
@@ -34,43 +32,37 @@ TMF8801_Io::TMF8801_Io(I2cWriteFunc write, I2cReadFunc read, uint8_t const i2c_s
  * PUBLIC MEMBER FUNCTIONS
  **************************************************************************************/
 
-uint8_t TMF8801_Io::read(Register const reg)
+bool TMF8801_Status::isCpuReady()
 {
-  uint8_t data = 0;
-  read(reg, &data, 1);
-  return data;
+  return _io.isBitSet(Register::ENABLE, bp(ENABLE::CPU_READY));
 }
 
-void TMF8801_Io::write(Register const reg, uint8_t const val)
+Application TMF8801_Status::currentApplication()
 {
-  write(reg, &val, 1);
-}
+  uint8_t const appid_val = _io.read(Register::APPID);
 
-void TMF8801_Io::read(Register const reg, uint8_t * buf, size_t const bytes)
-{
-  _read(_i2c_slave_addr, to_integer(reg), buf, bytes);
-}
-
-void TMF8801_Io::write(Register const reg, uint8_t const * buf, size_t const bytes)
-{
-  _write(_i2c_slave_addr, to_integer(reg), buf, bytes);
-}
-
-void TMF8801_Io::modify(Register const reg, uint8_t const bitmask, uint8_t const val)
-{
-  uint8_t reg_val = read(reg);
-  reg_val &= ~(bitmask);
-  reg_val |= (val & bitmask);
-  write(reg, reg_val);
-}
-
-bool TMF8801_Io::isBitSet(Register const reg, uint8_t const bitpos)
-{
-  uint8_t const reg_val = read(reg);
-  if (reg_val & (1<<bitpos))
-    return true;
+  if      (appid_val == to_integer(APPID::APP))
+    return Application::Measurement;
+  else if (appid_val == to_integer(APPID::BOOTLOADER))
+    return Application::Bootloader;
   else
-    return false;
+    return Application::Unkown;
+}
+
+RegisterContent TMF8801_Status::getRegisterContent()
+{
+  uint8_t const register_contents_val = _io.read(Register::REGISTER_CONTENTS);
+
+  if      (register_contents_val == to_integer(REGISTER_CONTENTS::CALIB_DATA))
+    return RegisterContent::CalibrationData;
+  else if (register_contents_val == to_integer(REGISTER_CONTENTS::SERIAL_NUMBER))
+    return RegisterContent::SerialNumber;
+  else if (register_contents_val == to_integer(REGISTER_CONTENTS::CMD_RESULT))
+    return RegisterContent::CommandResult;
+  else if ((register_contents_val >= 0x80) && (register_contents_val >= 0x93))
+    return RegisterContent::RawHistogram;
+  else
+    return RegisterContent::Unkown;
 }
 
 /**************************************************************************************

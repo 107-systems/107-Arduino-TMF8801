@@ -1,0 +1,28 @@
+#######################################
+# Syntax Coloring Map for 107-Arduino-TMF8801
+#######################################
+
+#######################################
+# Class (KEYWORD1)
+#######################################
+
+ArduinoTMF8801	KEYWORD1
+TMF8801	KEYWORD1
+CalibData	KEYWORD1
+AlgoState	KEYWORD1
+Error	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin	KEYWORD2
+clearerr	KEYWORD2
+isDataReady	KEYWORD2
+getDistance_mm	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+TMF8801_DEFAULT_I2C_ADDR	LITERAL1

@@ -5,16 +5,11 @@
  * Contributors: https://github.com/107-systems/107-Arduino-TMF8801/graphs/contributors.
  */
 
-#ifndef ARDUINO_TMF8801_TMF8801_IO_H_
-#define ARDUINO_TMF8801_TMF8801_IO_H_
-
 /**************************************************************************************
  * INCLUDE
  **************************************************************************************/
 
-#undef max
-#undef min
-#include <functional>
+#include "TMF8801_Config.h"
 
 #include "TMF8801_Const.h"
 
@@ -26,43 +21,31 @@ namespace TMF8801
 {
 
 /**************************************************************************************
- * TYPEDEF
+ * CTOR/DTOR
  **************************************************************************************/
 
-typedef std::function<void(uint8_t const, uint8_t const, uint8_t const *, uint8_t const)> I2cWriteFunc;
-typedef std::function<void(uint8_t const, uint8_t const, uint8_t       *, uint8_t const)> I2cReadFunc;
+TMF8801_Config::TMF8801_Config(TMF8801_Io & io)
+: _io{io}
+{
+
+}
 
 /**************************************************************************************
- * CLASS DECLARATION
+ * PUBLIC MEMBER FUNCTIONS
  **************************************************************************************/
 
-class TMF8801_Io
+void TMF8801_Config::loadCalibData(CalibData const & calib_data)
 {
-public:
+  _io.write(Register::FACTORY_CALIB_0, calib_data.data(), calib_data.size());
+}
 
-  TMF8801_Io(I2cWriteFunc write, I2cReadFunc read, uint8_t const i2c_slave_addr);
-
-
-  uint8_t read    (Register const reg);
-  void    write   (Register const reg, uint8_t const val);
-  void    read    (Register const reg, uint8_t * buf, size_t const bytes);
-  void    write   (Register const reg, uint8_t const * buf, size_t const bytes);
-  void    modify  (Register const reg, uint8_t const bitmask, uint8_t const val);
-  bool    isBitSet(Register const reg, uint8_t const bitpos);
-
-
-private:
-
-  I2cWriteFunc _write;
-  I2cReadFunc _read;
-
-  uint8_t const _i2c_slave_addr;
-};
+void TMF8801_Config::loadAlgoState(AlgoState const & algo_state)
+{
+  _io.write(Register::STATE_DATA_WR_0, algo_state.data(), algo_state.size());
+}
 
 /**************************************************************************************
  * NAMESPACE
  **************************************************************************************/
 
 } /* TMF8801 */
-
-#endif /* ARDUINO_TMF8801_TMF8801_IO_H_ */
