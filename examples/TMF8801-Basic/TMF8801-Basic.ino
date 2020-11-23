@@ -11,12 +11,6 @@
 #include <ArduinoTMF8801.h>
 
 /**************************************************************************************
- * CONSTANTS
- **************************************************************************************/
-
-static uint8_t const TMF8801_I2C_SLAVE_ADDR = (0x41 << 1);
-
-/**************************************************************************************
  * FUNCTION DECLARATION
  **************************************************************************************/
 
@@ -24,10 +18,21 @@ void i2c_write(uint8_t const i2c_slave_addr, uint8_t const reg_addr, uint8_t con
 void i2c_read (uint8_t const i2c_slave_addr, uint8_t const reg_addr, uint8_t       * buf, uint8_t const num_bytes);
 
 /**************************************************************************************
+ * GLOBAL CONSTANTS
+ **************************************************************************************/
+
+/* The calibration data needs to be obtained for every sensor by
+ * executing the sketch TMF8801-FactoryCalib with the sensor mounted
+ * in the target enviroment.
+ */
+TMF8801::CalibData const TMF8801_CALIB_DATA{0x31, 0x9E, 0x0, 0xB6, 0x9, 0xE0, 0xFB, 0xF7, 0xF8, 0xF1, 0xE3, 0xC7, 0x7, 0xFC};
+TMF8801::AlgoState const TMF8801_ALGO_STATE{0xB1, 0xA9, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+
+/**************************************************************************************
  * GLOBAL VARIABLES
  **************************************************************************************/
 
-TMF8801::TMF8801_Io io(i2c_write, i2c_read, TMF8801_I2C_SLAVE_ADDR);
+ArduinoTMF8801 tmf8801{i2c_write, i2c_read, delay, TMF8801_DEFAULT_I2C_ADDR, TMF8801_CALIB_DATA, TMF8801_ALGO_STATE};
 
 /**************************************************************************************
  * SETUP/LOOP
@@ -41,13 +46,22 @@ void setup()
   /* Setup Wire access */
   Wire.begin();
 
-  /* Read the ID of the chip */
-  uint8_t const chip_id = io.read(TMF8801::Register::ID); /* Should by 0x07 */
+  if (!tmf8801.begin()) {
+    Serial.print("ArduinoTMF8801::begin(...) failed, error code ");
+    Serial.print((int)tmf8801.error());
+    for(;;) { }
+  }
+
+  Serial.println("TMF8801 OK");
 }
 
 void loop()
 {
-
+  if (tmf8801.isDataReady()) {
+    Serial.print("Distance = ");
+    Serial.print(tmf8801.getDistance_mm());
+    Serial.println(" mm");
+  }
 }
 
 /**************************************************************************************
@@ -68,6 +82,8 @@ void i2c_read(uint8_t const i2c_slave_addr, uint8_t const reg_addr, uint8_t * bu
 {
   Wire.beginTransmission(i2c_slave_addr);
   Wire.write(reg_addr);
+  Wire.endTransmission();
+
   Wire.requestFrom(i2c_slave_addr, num_bytes);
   for(uint8_t bytes_read = 0; (bytes_read < num_bytes) && Wire.available(); bytes_read++) {
     buf[bytes_read] = Wire.read();
