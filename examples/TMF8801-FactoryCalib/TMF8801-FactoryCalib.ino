@@ -92,7 +92,7 @@ void setup()
   /* Wait for factory calibration to be complete
    */
   for (unsigned long const calib_start = millis();
-       (millis() - calib_start) < 5000;
+       (millis() - calib_start) < 10000;
        delay(100))
   {
     if (tmf8801_io.read(Register::REGISTER_CONTENTS) == to_integer(REGISTER_CONTENTS::CALIB_DATA))
@@ -100,14 +100,16 @@ void setup()
       Serial.println("Calibration complete");
       /* Reading all 14 bytes of obtained factory calibration data.
        */
-      Serial.print("FACTORY_CALIB_[0-13] = ");
+      Serial.print("FACTORY_CALIB_[0-13] = {0x");
       uint8_t factory_calib_data[14] = {0};
-      i2c_read(TMF8801_I2C_ADDR, to_integer(Register::FACTORY_CALIB_0), factory_calib_data, sizeof(factory_calib_data));
+      tmf8801_io.read(Register::FACTORY_CALIB_0, factory_calib_data, sizeof(factory_calib_data));
       for (size_t b = 0; b < sizeof(factory_calib_data); b++)
       {
         Serial.print(factory_calib_data[b], HEX);
-        Serial.print(" ");
+        if (b < (sizeof(factory_calib_data) - 1))
+          Serial.print(", 0x");
       }
+      Serial.println("}");
       /* Exit sketch here, calibration complete.
        */
       return;
