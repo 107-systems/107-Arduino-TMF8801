@@ -35,14 +35,14 @@ static uint8_t const TMF8801_I2C_ADDR = TMF8801_DEFAULT_I2C_ADDR;
  * FUNCTION DECLARATION
  **************************************************************************************/
 
-void i2c_write(uint8_t const i2c_slave_addr, uint8_t const reg_addr, uint8_t const * buf, uint8_t const num_bytes);
-void i2c_read (uint8_t const i2c_slave_addr, uint8_t const reg_addr, uint8_t       * buf, uint8_t const num_bytes);
+void i2c_generic_write(uint8_t const i2c_slave_addr, uint8_t const reg_addr, uint8_t const * buf, uint8_t const num_bytes);
+void i2c_generic_read (uint8_t const i2c_slave_addr, uint8_t const reg_addr, uint8_t       * buf, uint8_t const num_bytes);
 
 /**************************************************************************************
  * GLOBAL VARIABLES
  **************************************************************************************/
 
-TMF8801::TMF8801_Io tmf8801_io(i2c_write, i2c_read, TMF8801_I2C_ADDR);
+TMF8801::TMF8801_Io tmf8801_io(i2c_generic_write, i2c_generic_read, TMF8801_I2C_ADDR);
 
 /**************************************************************************************
  * SETUP/LOOP
@@ -133,7 +133,7 @@ void loop()
  * FUNCTION DEFINITION
  **************************************************************************************/
 
-void i2c_write(uint8_t const i2c_slave_addr, uint8_t const reg_addr, uint8_t const * buf, uint8_t const num_bytes)
+void i2c_generic_write(uint8_t const i2c_slave_addr, uint8_t const reg_addr, uint8_t const * buf, uint8_t const num_bytes)
 {
   Wire.beginTransmission(i2c_slave_addr);
   Wire.write(reg_addr);
@@ -143,7 +143,7 @@ void i2c_write(uint8_t const i2c_slave_addr, uint8_t const reg_addr, uint8_t con
   Wire.endTransmission();
 }
 
-void i2c_read(uint8_t const i2c_slave_addr, uint8_t const reg_addr, uint8_t * buf, uint8_t const num_bytes)
+void i2c_generic_read(uint8_t const i2c_slave_addr, uint8_t const reg_addr, uint8_t * buf, uint8_t const num_bytes)
 {
   Wire.beginTransmission(i2c_slave_addr);
   Wire.write(reg_addr);

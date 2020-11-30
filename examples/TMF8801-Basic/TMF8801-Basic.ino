@@ -14,8 +14,8 @@
  * FUNCTION DECLARATION
  **************************************************************************************/
 
-void i2c_write(uint8_t const i2c_slave_addr, uint8_t const reg_addr, uint8_t const * buf, uint8_t const num_bytes);
-void i2c_read (uint8_t const i2c_slave_addr, uint8_t const reg_addr, uint8_t       * buf, uint8_t const num_bytes);
+void i2c_generic_write(uint8_t const i2c_slave_addr, uint8_t const reg_addr, uint8_t const * buf, uint8_t const num_bytes);
+void i2c_generic_read (uint8_t const i2c_slave_addr, uint8_t const reg_addr, uint8_t       * buf, uint8_t const num_bytes);
 
 /**************************************************************************************
  * GLOBAL CONSTANTS
@@ -32,7 +32,7 @@ TMF8801::AlgoState const TMF8801_ALGO_STATE{0xB1, 0xA9, 0x02, 0x00, 0x00, 0x00, 
  * GLOBAL VARIABLES
  **************************************************************************************/
 
-ArduinoTMF8801 tmf8801{i2c_write, i2c_read, delay, TMF8801_DEFAULT_I2C_ADDR, TMF8801_CALIB_DATA, TMF8801_ALGO_STATE};
+ArduinoTMF8801 tmf8801{i2c_generic_write, i2c_generic_read, delay, TMF8801_DEFAULT_I2C_ADDR, TMF8801_CALIB_DATA, TMF8801_ALGO_STATE};
 
 /**************************************************************************************
  * SETUP/LOOP
@@ -68,7 +68,7 @@ void loop()
  * FUNCTION DEFINITION
  **************************************************************************************/
 
-void i2c_write(uint8_t const i2c_slave_addr, uint8_t const reg_addr, uint8_t const * buf, uint8_t const num_bytes)
+void i2c_generic_write(uint8_t const i2c_slave_addr, uint8_t const reg_addr, uint8_t const * buf, uint8_t const num_bytes)
 {
   Wire.beginTransmission(i2c_slave_addr);
   Wire.write(reg_addr);
@@ -78,7 +78,7 @@ void i2c_write(uint8_t const i2c_slave_addr, uint8_t const reg_addr, uint8_t con
   Wire.endTransmission();
 }
 
-void i2c_read(uint8_t const i2c_slave_addr, uint8_t const reg_addr, uint8_t * buf, uint8_t const num_bytes)
+void i2c_generic_read(uint8_t const i2c_slave_addr, uint8_t const reg_addr, uint8_t * buf, uint8_t const num_bytes)
 {
   Wire.beginTransmission(i2c_slave_addr);
   Wire.write(reg_addr);
