@@ -29,12 +29,12 @@ namespace TMF8801
 
 enum class Application
 {
-  Unkown, Measurement, Bootloader
+  Unknown, Measurement, Bootloader
 };
 
 enum class RegisterContent
 {
-  Unkown, CalibrationData, SerialNumber, CommandResult, RawHistogram
+  Unknown, CalibrationData, SerialNumber, CommandResult, RawHistogram
 };
 
 /**************************************************************************************
