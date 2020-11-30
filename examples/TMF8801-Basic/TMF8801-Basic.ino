@@ -23,7 +23,7 @@ void i2c_read (uint8_t const i2c_slave_addr, uint8_t const reg_addr, uint8_t    
 
 /* The calibration data needs to be obtained for every sensor by
  * executing the sketch TMF8801-FactoryCalib with the sensor mounted
- * in the target enviroment.
+ * in the target environment.
  */
 TMF8801::CalibData const TMF8801_CALIB_DATA{0x31, 0x9E, 0x0, 0xB6, 0x9, 0xE0, 0xFB, 0xF7, 0xF8, 0xF1, 0xE3, 0xC7, 0x7, 0xFC};
 TMF8801::AlgoState const TMF8801_ALGO_STATE{0xB1, 0xA9, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};

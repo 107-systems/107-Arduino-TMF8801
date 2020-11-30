@@ -125,7 +125,7 @@ bool ArduinoTMF8801::waitForCpuReady()
       return true;
   }
 
-  /* A timeout has occured. */
+  /* A timeout has occurred. */
   _error = TMF8801::Error::Timeout;
   return false;
 }
@@ -144,7 +144,7 @@ bool ArduinoTMF8801::waitForApplication()
       return true;
   }
 
-  /* A timeout has occured. */
+  /* A timeout has occurred. */
   _error = TMF8801::Error::Timeout;
   return false;
 }

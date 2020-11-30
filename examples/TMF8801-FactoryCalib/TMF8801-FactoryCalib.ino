@@ -72,7 +72,7 @@ void setup()
   tmf8801_io.modify(Register::ENABLE, bm(ENABLE::CPU_RESET), bm(ENABLE::CPU_RESET));
   delay(100);
   if (!tmf8801_io.isBitSet(Register::ENABLE, bp(ENABLE::CPU_READY))) {
-    Serial.println("Error, cpu not ready after reset");
+    Serial.println("Error, CPU not ready after reset");
     return;
   }
 
@@ -116,7 +116,7 @@ void setup()
     }
   }
 
-  /* A timeout has occured, let's check the status register for
+  /* A timeout has occurred, let's check the status register for
    * the error cause.
    */
   Serial.println("Timeout during calibration");
