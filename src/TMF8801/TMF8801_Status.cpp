@@ -46,7 +46,7 @@ Application TMF8801_Status::currentApplication()
   else if (appid_val == to_integer(APPID::BOOTLOADER))
     return Application::Bootloader;
   else
-    return Application::Unkown;
+    return Application::Unknown;
 }
 
 RegisterContent TMF8801_Status::getRegisterContent()
@@ -62,7 +62,7 @@ RegisterContent TMF8801_Status::getRegisterContent()
   else if ((register_contents_val >= 0x80) && (register_contents_val >= 0x93))
     return RegisterContent::RawHistogram;
   else
-    return RegisterContent::Unkown;
+    return RegisterContent::Unknown;
 }
 
 /**************************************************************************************
