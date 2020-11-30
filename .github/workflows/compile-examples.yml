@@ -1,0 +1,62 @@
+name: Compile Examples
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/compile-examples.yml"
+      - "examples/**"
+      - "src/**"
+  push:
+    paths:
+      - ".github/workflows/compile-examples.yml"
+      - "examples/**"
+      - "src/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      SKETCHES_REPORTS_PATH: sketches-reports
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        fqbn:
+          - arduino:samd:arduino_zero_edbg
+          - arduino:samd:mkr1000
+          - arduino:samd:mkrzero
+          - arduino:samd:mkrwifi1010
+          - arduino:samd:nano_33_iot
+          - arduino:samd:mkrfox1200
+          - arduino:samd:mkrwan1300
+          - arduino:samd:mkrwan1310
+          - arduino:samd:mkrgsm1400
+          - arduino:samd:mkrnb1500
+          - arduino:samd:mkrvidor4000
+          - arduino:mbed:envie_m7
+          - arduino:mbed:envie_m4
+          - arduino:mbed:nano33ble
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Compile examples
+        uses: arduino/compile-sketches@main
+        with:
+          fqbn: ${{ matrix.fqbn }}
+          libraries: |
+            # Install the WiFi101 library from the local path
+            - source-path: ./
+          sketch-paths: |
+            - ./examples/
+          enable-deltas-report: true
+          sketches-report-path: ${{ env.SKETCHES_REPORTS_PATH }}
+
+      - name: Save memory usage change report as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.SKETCHES_REPORTS_PATH }}
+          path: ${{ env.SKETCHES_REPORTS_PATH }}
