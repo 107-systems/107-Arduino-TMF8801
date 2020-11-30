@@ -2,6 +2,7 @@
 =====================
 
 [![Compile Examples](https://github.com/107-systems/107-Arduino-TMF8801/workflows/Compile%20Examples/badge.svg)](https://github.com/107-systems/107-Arduino-TMF8801/actions?workflow=Compile+Examples)
+[![Extra Library Checks](https://github.com/107-systems/107-Arduino-TMF8801/workflows/Extra%20Library%20Checks/badge.svg)](https://github.com/107-systems/107-Arduino-TMF8801/actions?workflow=Extra+Library+Checks)
 
 Arduino library for the AMS TMF8801 time-of-flight sensor.
 
