@@ -12,7 +12,12 @@ Arduino library for the AMS TMF8801 time-of-flight sensor.
   <a href="https://github.com/107-systems/107-Arduino-Viper"><img src="https://github.com/107-systems/.github/raw/main/logo/viper.jpg" width="40%"></a>
 </p>
 
-### How to connect the TMF8801-DB breakout board
+### Hardware
+#### Breakout/Development-Board
+* [TMF8801Breakout](https://github.com/generationmake/TMF8801Breakout)
+* [TMF8801-DB](extras/doc/TMF8801-Daughter-Card-Schematic-Rev-B.pdf)
+
+#### How to connect the TMF8801-DB breakout board
 The following hardware items are required:
 * 1 x [TMF8801-DB](extras/doc/TMF8801-Daughter-Card-Schematic-Rev-B.pdf)
 * 1 x [Adafruit FPC Stick](https://www.adafruit.com/product/1325)
