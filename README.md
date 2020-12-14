@@ -32,10 +32,10 @@ The following hardware items are required:
   <img src="extras/img/tmf8801-setup.jpg" width="40%">
 </p>
 
-| **Colour** | **Function** |
-|:----------:|:------------:|
-| Red        |    3V3       |
-| Black      |    GND       |
-| Green      |    INT       |
-| Yellow     |    SCL       |
-| Blue       |    SDA       |
+| **Colour** | **Function** | **Arduino Zero Pin** |
+|:----------:|:------------:|:--------------------:|
+| Red        |    3V3       | 3.3V                 |
+| Black      |    GND       | GND                  |
+| Green      |    INT       | D2                   |
+| Yellow     |    SCL       | SCL                  |
+| Blue       |    SDA       | SDA                  |
