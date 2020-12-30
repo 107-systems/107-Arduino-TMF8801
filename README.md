@@ -9,7 +9,7 @@
 Arduino library for the AMS TMF8801 time-of-flight sensor.
 
 <p align="center">
-  <a href="https://github.com/107-systems/107-Arduino-Viper"><img src="https://github.com/107-systems/.github/raw/main/logo/viper.jpg" width="40%"></a>
+  <a href="https://github.com/107-systems/Viper-Firmware"><img src="https://github.com/107-systems/.github/raw/main/logo/viper.jpg" width="40%"></a>
 </p>
 
 This library works for
