@@ -24,6 +24,15 @@ namespace TMF8801
 {
 
 /**************************************************************************************
+ * TYPEDEF
+ **************************************************************************************/
+
+enum class InterruptSource
+{
+  ObjectDectectionAvailable, RawHistogramAvailable
+};
+
+/**************************************************************************************
  * CLASS DECLARATION
  **************************************************************************************/
 
@@ -35,9 +44,13 @@ public:
   TMF8801_Control(TMF8801_Io & io);
 
 
-  void reset();
+  void reset          ();
   void loadApplication();
-  void loadBootloader();
+  void loadBootloader ();
+
+  void clearInterrupt  (InterruptSource const src);
+  void enableInterrupt (InterruptSource const src);
+  void disableInterrupt(InterruptSource const src);
 
   void readObjectDetectionResult(ObjectDetectionData & data);
 
