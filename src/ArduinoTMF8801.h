@@ -46,7 +46,7 @@ public:
                  TMF8801::AlgoState const & algo_state);
 
 
-  bool begin();
+  bool begin(uint8_t const measurement_period_ms);
 
 
   void           clearerr();
