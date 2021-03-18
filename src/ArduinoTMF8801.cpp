@@ -37,7 +37,7 @@ ArduinoTMF8801::ArduinoTMF8801(TMF8801::I2cWriteFunc write,
  * PUBLIC MEMBER FUNCTIONS
  **************************************************************************************/
 
-bool ArduinoTMF8801::begin()
+bool ArduinoTMF8801::begin(uint8_t const measurement_period_ms)
 {
   /* Reset the board and wait for the board to come up again
    * within a predefined time period.
@@ -74,7 +74,7 @@ bool ArduinoTMF8801::begin()
   _io.write(TMF8801::Register::CMD_DATA5, 0x00); /* No GPIO control used */
   _io.write(TMF8801::Register::CMD_DATA4, 0x00); /* No GPIO control used */
   _io.write(TMF8801::Register::CMD_DATA3, 0x00); /* Needs to be always 00 */
-  _io.write(TMF8801::Register::CMD_DATA2, 0x64); /* Repetition period in ms 64 hex = 100ms */
+  _io.write(TMF8801::Register::CMD_DATA2, measurement_period_ms);
   _io.write(TMF8801::Register::CMD_DATA1, 0xFF); /* Needs to be always ff */
   _io.write(TMF8801::Register::CMD_DATA0, 0xFF); /* Needs to be always ff */
   _io.write(TMF8801::Register::COMMAND,   TMF8801::to_integer(TMF8801::COMMAND::DISTANCE_MEASURE_MODE_1)); /* Set flag to perform target distance measurement with 8 bytes of data containing where including setting of calibration (and algorithm state) configuration. */
