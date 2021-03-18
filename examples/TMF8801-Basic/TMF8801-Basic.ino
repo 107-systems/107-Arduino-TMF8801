@@ -26,8 +26,9 @@ void i2c_generic_read (uint8_t const i2c_slave_addr, uint8_t const reg_addr, uin
  * in the target environment.
  */
 #warning "Run 'TMF8801-FactoryCalib' once in order to obtain sensor calibration data for constant TMF8801_CALIB_DATA"
-TMF8801::CalibData const TMF8801_CALIB_DATA{0x31, 0x9E, 0x0, 0xB6, 0x9, 0xE0, 0xFB, 0xF7, 0xF8, 0xF1, 0xE3, 0xC7, 0x7, 0xFC};
-TMF8801::AlgoState const TMF8801_ALGO_STATE{0xB1, 0xA9, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+static TMF8801::CalibData const TMF8801_CALIB_DATA{0x31, 0x9E, 0x0, 0xB6, 0x9, 0xE0, 0xFB, 0xF7, 0xF8, 0xF1, 0xE3, 0xC7, 0x7, 0xFC};
+static TMF8801::AlgoState const TMF8801_ALGO_STATE{0xB1, 0xA9, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+static uint8_t const MEASUREMENT_PERIOD_ms = 100;
 
 /**************************************************************************************
  * GLOBAL VARIABLES
@@ -47,7 +48,7 @@ void setup()
   /* Setup Wire access */
   Wire.begin();
 
-  if (!tmf8801.begin()) {
+  if (!tmf8801.begin(MEASUREMENT_PERIOD_ms)) {
     Serial.print("ArduinoTMF8801::begin(...) failed, error code ");
     Serial.print((int)tmf8801.error());
     for(;;) { }
