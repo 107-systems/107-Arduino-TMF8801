@@ -150,6 +150,18 @@ enum class REGISTER_CONTENTS : uint8_t
   CMD_RESULT    = 0x55,
 };
 
+enum class INT_STATUS : uint8_t
+{
+  INT1 = 0,
+  INT2 = 1,
+};
+
+enum class INT_ENAB : uint8_t
+{
+  INT1 = 0,
+  INT2 = 1,
+};
+
 enum class Error : int
 {
   None    =  0,

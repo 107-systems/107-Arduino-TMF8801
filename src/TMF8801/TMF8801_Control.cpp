@@ -55,6 +55,30 @@ void TMF8801_Control::loadBootloader()
   _io.write(Register::APPREQID, to_integer(APPREQID::BOOTLOADER));
 }
 
+void TMF8801_Control::clearInterrupt(InterruptSource const src)
+{
+  if (src == InterruptSource::ObjectDectectionAvailable)
+    _io.write(Register::INT_STATUS, bm(INT_STATUS::INT1));
+  else
+    _io.write(Register::INT_STATUS, bm(INT_STATUS::INT2));
+}
+
+void TMF8801_Control::enableInterrupt(InterruptSource const src)
+{
+  if (src == InterruptSource::ObjectDectectionAvailable)
+    _io.modify(Register::INT_ENAB, bm(INT_ENAB::INT1), bm(INT_ENAB::INT1));
+  else
+    _io.modify(Register::INT_ENAB, bm(INT_ENAB::INT2), bm(INT_ENAB::INT2));
+}
+
+void TMF8801_Control::disableInterrupt(InterruptSource const src)
+{
+  if (src == InterruptSource::ObjectDectectionAvailable)
+    _io.modify(Register::INT_ENAB, bm(INT_ENAB::INT1), 0);
+  else
+    _io.modify(Register::INT_ENAB, bm(INT_ENAB::INT2), 0);
+}
+
 void TMF8801_Control::readObjectDetectionResult(ObjectDetectionData & data)
 {
   _io.read(Register::RESULT_NUMBER, data.buf, sizeof(data.buf));
