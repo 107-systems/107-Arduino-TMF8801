@@ -8,7 +8,7 @@
 
 #include <Wire.h>
 
-#include <ArduinoTMF8801.h>
+#include <107-Arduino-TMF8801.h>
 
 /**************************************************************************************
  * FUNCTION DECLARATION
