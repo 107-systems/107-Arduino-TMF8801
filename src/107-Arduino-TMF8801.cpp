@@ -23,7 +23,12 @@ ArduinoTMF8801::ArduinoTMF8801(TMF8801::I2cWriteFunc write,
                                uint8_t const i2c_slave_addr,
                                TMF8801::CalibData const & calib_data,
                                TMF8801::AlgoState const & algo_state)
-: _error{TMF8801::Error::None}
+: drone::LengthSensorBase("TMF8801",
+                           2.5000 * drone::unit::meter,
+                           0.0020 * drone::unit::meter,
+                           0.0    * drone::unit::hertz,
+                           nullptr)
+, _error{TMF8801::Error::None}
 , _io{write, read, i2c_slave_addr}
 , _delay{delay}
 , _config{_io}
@@ -102,11 +107,11 @@ bool ArduinoTMF8801::isDataReady()
   return (_status.getRegisterContent() == TMF8801::RegisterContent::CommandResult);
 }
 
-unsigned int ArduinoTMF8801::getDistance_mm()
+void ArduinoTMF8801::readData()
 {
   TMF8801::ObjectDetectionData data;
   _ctrl.readObjectDetectionResult(data);
-  return data.field.distance_peak_0_mm;
+  _distance = (data.field.distance_peak_0_mm / 1000.0) * drone::unit::meter;
 }
 
 /**************************************************************************************
