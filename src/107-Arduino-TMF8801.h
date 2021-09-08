@@ -12,6 +12,8 @@
  * INCLUDE
  **************************************************************************************/
 
+#include <107-Arduino-Sensor.hpp>
+
 #undef max
 #undef min
 #include <functional>
@@ -33,7 +35,7 @@ static uint8_t constexpr TMF8801_DEFAULT_I2C_ADDR = 0x41;
  * CLASS DECLARATION
  **************************************************************************************/
 
-class ArduinoTMF8801
+class ArduinoTMF8801 : public drone::LengthSensorBase
 {
 
 public:
@@ -54,7 +56,8 @@ public:
 
 
   bool isDataReady();
-  unsigned int getDistance_mm();
+  void readData();
+  virtual void get(drone::unit::Length & distance) const override { distance = _distance; }
 
 
 private:
@@ -67,6 +70,7 @@ private:
   TMF8801::TMF8801_Status _status;
   TMF8801::CalibData const & _calib_data;
   TMF8801::AlgoState const & _algo_state;
+  drone::unit::Length _distance;
 
   bool waitForCpuReady();
   bool waitForApplication();

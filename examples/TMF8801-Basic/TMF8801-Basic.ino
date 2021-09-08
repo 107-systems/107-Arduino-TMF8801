@@ -59,10 +59,15 @@ void setup()
 
 void loop()
 {
-  if (tmf8801.isDataReady()) {
-    Serial.print("Distance = ");
-    Serial.print(tmf8801.getDistance_mm());
-    Serial.println(" mm");
+  if (tmf8801.isDataReady())
+  {
+    drone::unit::Length distance = 0.0 * drone::unit::meter;
+    tmf8801.readData();
+    tmf8801.get(distance);
+
+    char msg[32];
+    snprintf(msg, sizeof(msg), "Distance = %0.3f m", distance.value());
+    Serial.println(msg);
   }
 }
 
