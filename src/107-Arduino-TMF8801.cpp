@@ -14,6 +14,13 @@
 #include <Arduino.h>
 
 /**************************************************************************************
+ * NAMESPACE
+ **************************************************************************************/
+
+namespace drone
+{
+
+/**************************************************************************************
  * CTOR/DTOR
  **************************************************************************************/
 
@@ -23,10 +30,10 @@ ArduinoTMF8801::ArduinoTMF8801(TMF8801::I2cWriteFunc write,
                                uint8_t const i2c_slave_addr,
                                TMF8801::CalibData const & calib_data,
                                TMF8801::AlgoState const & algo_state)
-: drone::LengthSensorBase("TMF8801",
-                           2.5000 * drone::unit::meter,
-                           0.0020 * drone::unit::meter,
-                           0.0    * drone::unit::hertz,
+: LengthSensorBase("TMF8801",
+                           2.5000 * unit::meter,
+                           0.0020 * unit::meter,
+                           0.0    * unit::hertz,
                            nullptr)
 , _error{TMF8801::Error::None}
 , _io{write, read, i2c_slave_addr}
@@ -111,7 +118,7 @@ void ArduinoTMF8801::readData()
 {
   TMF8801::ObjectDetectionData data;
   _ctrl.readObjectDetectionResult(data);
-  _distance = (data.field.distance_peak_0_mm / 1000.0) * drone::unit::meter;
+  _distance = (data.field.distance_peak_0_mm / 1000.0) * unit::meter;
 }
 
 /**************************************************************************************
@@ -155,3 +162,9 @@ bool ArduinoTMF8801::waitForApplication()
   _error = TMF8801::Error::Timeout;
   return false;
 }
+
+/**************************************************************************************
+ * NAMESPACE
+ **************************************************************************************/
+
+} /* drone */
