@@ -114,11 +114,11 @@ bool ArduinoTMF8801::isDataReady()
   return (_status.getRegisterContent() == TMF8801::RegisterContent::CommandResult);
 }
 
-void ArduinoTMF8801::readData()
+void ArduinoTMF8801::get(unit::Length & distance)
 {
   TMF8801::ObjectDetectionData data;
   _ctrl.readObjectDetectionResult(data);
-  _distance = (data.field.distance_peak_0_mm / 1000.0) * unit::meter;
+  distance = (data.field.distance_peak_0_mm / 1000.0) * unit::meter;
 }
 
 /**************************************************************************************

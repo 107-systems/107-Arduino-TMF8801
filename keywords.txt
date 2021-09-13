@@ -19,7 +19,6 @@ Error	KEYWORD1
 begin	KEYWORD2
 clearerr	KEYWORD2
 isDataReady	KEYWORD2
-getDistance_mm	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)

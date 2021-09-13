@@ -63,8 +63,7 @@ public:
 
 
   bool isDataReady();
-  void readData();
-  virtual void get(unit::Length & distance) const override { distance = _distance; }
+  virtual void get(unit::Length & distance) override;
 
 
 private:
@@ -77,7 +76,6 @@ private:
   TMF8801::TMF8801_Status _status;
   TMF8801::CalibData const & _calib_data;
   TMF8801::AlgoState const & _algo_state;
-  unit::Length _distance;
 
   bool waitForCpuReady();
   bool waitForApplication();

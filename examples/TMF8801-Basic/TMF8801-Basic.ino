@@ -68,7 +68,6 @@ void loop()
   if (tmf8801.isDataReady())
   {
     unit::Length distance = 0.0 * unit::meter;
-    tmf8801.readData();
     tmf8801.get(distance);
 
     char msg[32];
