@@ -30,7 +30,7 @@ using namespace drone;
  * CONSTANTS
  **************************************************************************************/
 
-static uint8_t const TMF8801_I2C_ADDR = TMF8801_DEFAULT_I2C_ADDR;
+static uint8_t const TMF8801_I2C_ADDR = TMF8801::DEFAULT_I2C_ADDR;
 
 /**************************************************************************************
  * FUNCTION DECLARATION
