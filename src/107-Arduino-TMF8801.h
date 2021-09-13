@@ -47,23 +47,29 @@ class ArduinoTMF8801 : public LengthSensorBase
 
 public:
 
+  typedef std::function<void(unit::Length const)> OnLengthDataUpdateFunc;
+
+
   ArduinoTMF8801(TMF8801::I2cWriteFunc write,
                  TMF8801::I2cReadFunc read,
                  TMF8801::DelayFunc delay,
                  uint8_t const i2c_slave_addr,
                  TMF8801::CalibData const & calib_data,
-                 TMF8801::AlgoState const & algo_state);
+                 TMF8801::AlgoState const & algo_state,
+                 OnLengthDataUpdateFunc func);
 
 
   bool begin(uint8_t const measurement_period_ms);
 
 
+  void onExternalEventHandler();
+
+
+  virtual void get(unit::Length & distance) override;
+
+
   void           clearerr();
   TMF8801::Error error();
-
-
-  bool isDataReady();
-  virtual void get(unit::Length & distance) override;
 
 
 private:
@@ -76,6 +82,7 @@ private:
   TMF8801::TMF8801_Status _status;
   TMF8801::CalibData const & _calib_data;
   TMF8801::AlgoState const & _algo_state;
+  unit::Length _distance;
 
   bool waitForCpuReady();
   bool waitForApplication();
