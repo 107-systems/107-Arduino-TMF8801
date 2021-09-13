@@ -174,6 +174,7 @@ enum class Error : int
  **************************************************************************************/
 
 static uint8_t constexpr ID_EXPECTED_ID = 0x07;
+static uint8_t constexpr DEFAULT_I2C_ADDR = 0x41;
 
 /**************************************************************************************
  * CONVERSION FUNCTIONS

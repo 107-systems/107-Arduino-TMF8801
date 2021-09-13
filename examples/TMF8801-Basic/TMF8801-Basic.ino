@@ -49,7 +49,7 @@ static uint8_t const MEASUREMENT_PERIOD_ms = 100;
 ArduinoTMF8801 tmf8801(i2c_generic_write,
                        i2c_generic_read,
                        delay,
-                       TMF8801_DEFAULT_I2C_ADDR,
+                       TMF8801::DEFAULT_I2C_ADDR,
                        TMF8801_CALIB_DATA,
                        TMF8801_ALGO_STATE,
                        [](unit::Length const distance)

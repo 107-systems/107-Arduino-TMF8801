@@ -25,4 +25,4 @@ onExternalEventHandler	KEYWORD2
 # Constants (LITERAL1)
 #######################################
 
-TMF8801_DEFAULT_I2C_ADDR	LITERAL1
+DEFAULT_I2C_ADDR	LITERAL1
