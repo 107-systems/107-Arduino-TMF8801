@@ -17,6 +17,12 @@
 using namespace drone;
 
 /**************************************************************************************
+ * CONSTANTS
+ **************************************************************************************/
+
+static int const TMF8801_INT_PIN = 6;
+
+/**************************************************************************************
  * FUNCTION DECLARATION
  **************************************************************************************/
 
@@ -40,7 +46,18 @@ static uint8_t const MEASUREMENT_PERIOD_ms = 100;
  * GLOBAL VARIABLES
  **************************************************************************************/
 
-ArduinoTMF8801 tmf8801{i2c_generic_write, i2c_generic_read, delay, TMF8801_DEFAULT_I2C_ADDR, TMF8801_CALIB_DATA, TMF8801_ALGO_STATE};
+ArduinoTMF8801 tmf8801(i2c_generic_write,
+                       i2c_generic_read,
+                       delay,
+                       TMF8801_DEFAULT_I2C_ADDR,
+                       TMF8801_CALIB_DATA,
+                       TMF8801_ALGO_STATE,
+                       [](unit::Length const distance)
+                       {
+                         char msg[32];
+                         snprintf(msg, sizeof(msg), "Distance = %0.3f m", distance.value());
+                         Serial.println(msg);
+                       });
 
 /**************************************************************************************
  * SETUP/LOOP
@@ -51,10 +68,19 @@ void setup()
   Serial.begin(9600);
   while(!Serial) { }
 
+  /* Print data of TMF8801 sensor. */
+  Serial.print(tmf8801);
+
   /* Setup Wire access */
   Wire.begin();
 
-  if (!tmf8801.begin(MEASUREMENT_PERIOD_ms)) {
+  /* Attach interrupt handler */
+  pinMode(TMF8801_INT_PIN, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(TMF8801_INT_PIN), [](){ tmf8801.onExternalEventHandler(); }, FALLING);
+
+  /* Configure TMF8801 */
+  if (!tmf8801.begin(MEASUREMENT_PERIOD_ms))
+  {
     Serial.print("ArduinoTMF8801::begin(...) failed, error code ");
     Serial.print((int)tmf8801.error());
     for(;;) { }
@@ -65,15 +91,7 @@ void setup()
 
 void loop()
 {
-  if (tmf8801.isDataReady())
-  {
-    unit::Length distance = 0.0 * unit::meter;
-    tmf8801.get(distance);
 
-    char msg[32];
-    snprintf(msg, sizeof(msg), "Distance = %0.3f m", distance.value());
-    Serial.println(msg);
-  }
 }
 
 /**************************************************************************************
