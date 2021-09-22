@@ -32,10 +32,10 @@ ArduinoTMF8801::ArduinoTMF8801(TMF8801::I2cWriteFunc write,
                                TMF8801::AlgoState const & algo_state,
                                OnLengthDataUpdateFunc func)
 : LengthSensorBase("TMF8801",
-                           2.5000 * unit::meter,
-                           0.0020 * unit::meter,
-                           0.0    * unit::hertz,
-                           func)
+                   2.5000 * unit::meter,
+                   0.0020 * unit::meter,
+                   0.0    * unit::hertz,
+                   func)
 , _error{TMF8801::Error::None}
 , _io{write, read, i2c_slave_addr}
 , _delay{delay}
