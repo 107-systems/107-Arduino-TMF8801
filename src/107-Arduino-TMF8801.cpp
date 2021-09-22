@@ -39,9 +39,7 @@ ArduinoTMF8801::ArduinoTMF8801(TMF8801::I2cWriteFunc write,
 , _error{TMF8801::Error::None}
 , _io{write, read, i2c_slave_addr}
 , _delay{delay}
-, _config{_io}
 , _ctrl{_io}
-, _status{_io}
 , _calib_data{calib_data}
 , _algo_state{algo_state}
 {
@@ -76,8 +74,8 @@ bool ArduinoTMF8801::begin(uint8_t const measurement_period_ms)
     return false;
 
   _io.write(TMF8801::Register::COMMAND, TMF8801::to_integer(TMF8801::COMMAND::DOWNLOAD_CALIB_AND_STATE));
-  _config.loadCalibData(_calib_data);
-  _config.loadAlgoState(_algo_state);
+  _ctrl.loadCalibData(_calib_data);
+  _ctrl.loadAlgoState(_algo_state);
 
   /* Clear the interrupt to remove any remaining pending artefacts
    * then enable the interrupt for a new distance measurement available.
@@ -153,7 +151,7 @@ bool ArduinoTMF8801::waitForCpuReady()
   for (; t < CPU_READY_TIMEOUT_ms; t += CPU_READY_TIMEOUT_INCREMENT_ms)
   {
     _delay(CPU_READY_TIMEOUT_INCREMENT_ms);
-    if (_status.isCpuReady())
+    if (_ctrl.isCpuReady())
       return true;
   }
 
@@ -172,7 +170,7 @@ bool ArduinoTMF8801::waitForApplication()
   for (; t < APP_LOADED_TIMEOUT_ms; t += APP_LOADED_TIMEOUT_INCREMENT_ms)
   {
     _delay(APP_LOADED_TIMEOUT_INCREMENT_ms);
-    if (_status.currentApplication() == TMF8801::Application::Measurement)
+    if (_ctrl.currentApplication() == TMF8801::Application::Measurement)
       return true;
   }
 

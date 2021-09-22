@@ -32,6 +32,16 @@ enum class InterruptSource
   ObjectDectectionAvailable, RawHistogramAvailable
 };
 
+enum class Application
+{
+  Unknown, Measurement, Bootloader
+};
+
+enum class RegisterContent
+{
+  Unknown, CalibrationData, SerialNumber, CommandResult, RawHistogram
+};
+
 /**************************************************************************************
  * CLASS DECLARATION
  **************************************************************************************/
@@ -44,6 +54,8 @@ public:
   TMF8801_Control(TMF8801_Io & io);
 
 
+  /* Control
+   */
   void reset          ();
   void loadApplication();
   void loadBootloader ();
@@ -53,6 +65,18 @@ public:
   void disableInterrupt(InterruptSource const src);
 
   void readObjectDetectionResult(ObjectDetectionData & data);
+
+
+  /* Configuration
+   */
+  void loadCalibData(CalibData const & calib_data);
+  void loadAlgoState(AlgoState const & algo_state);
+
+  /* Status
+   */
+  bool            isCpuReady();
+  Application     currentApplication();
+  RegisterContent getRegisterContent();
 
 
 private:

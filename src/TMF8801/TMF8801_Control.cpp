@@ -84,6 +84,49 @@ void TMF8801_Control::readObjectDetectionResult(ObjectDetectionData & data)
   _io.read(Register::RESULT_NUMBER, data.buf, sizeof(data.buf));
 }
 
+void TMF8801_Control::loadCalibData(CalibData const & calib_data)
+{
+  _io.write(Register::FACTORY_CALIB_0, calib_data.data(), calib_data.size());
+}
+
+void TMF8801_Control::loadAlgoState(AlgoState const & algo_state)
+{
+  _io.write(Register::STATE_DATA_WR_0, algo_state.data(), algo_state.size());
+}
+
+bool TMF8801_Control::isCpuReady()
+{
+  return _io.isBitSet(Register::ENABLE, bp(ENABLE::CPU_READY));
+}
+
+Application TMF8801_Control::currentApplication()
+{
+  uint8_t const appid_val = _io.read(Register::APPID);
+
+  if      (appid_val == to_integer(APPID::APP))
+    return Application::Measurement;
+  else if (appid_val == to_integer(APPID::BOOTLOADER))
+    return Application::Bootloader;
+  else
+    return Application::Unknown;
+}
+
+RegisterContent TMF8801_Control::getRegisterContent()
+{
+  uint8_t const register_contents_val = _io.read(Register::REGISTER_CONTENTS);
+
+  if      (register_contents_val == to_integer(REGISTER_CONTENTS::CALIB_DATA))
+    return RegisterContent::CalibrationData;
+  else if (register_contents_val == to_integer(REGISTER_CONTENTS::SERIAL_NUMBER))
+    return RegisterContent::SerialNumber;
+  else if (register_contents_val == to_integer(REGISTER_CONTENTS::CMD_RESULT))
+    return RegisterContent::CommandResult;
+  else if ((register_contents_val >= 0x80) && (register_contents_val >= 0x93))
+    return RegisterContent::RawHistogram;
+  else
+    return RegisterContent::Unknown;
+}
+
 /**************************************************************************************
  * NAMESPACE
  **************************************************************************************/
