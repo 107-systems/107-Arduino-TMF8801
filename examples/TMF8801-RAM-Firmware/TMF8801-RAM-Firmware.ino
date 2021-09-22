@@ -15,7 +15,7 @@
 #define DBG_ENABLE_WARNING
 #define DBG_ENABLE_INFO
 #define DBG_ENABLE_DEBUG
-//#define DBG_ENABLE_VERBOSE
+#define DBG_ENABLE_VERBOSE
 #include <ArduinoDebug.hpp>
 
 /**************************************************************************************
@@ -91,11 +91,12 @@ void setup()
 
   /* Obtain major, minor, patch number of current ROM firmware.
    */
-  uint8_t const app_rev_major = tmf8801_io.read(Register::APPREV_MAJOR);
-  uint8_t const app_rev_minor = tmf8801_io.read(Register::APPREV_MINOR);
-  uint8_t const app_rev_patch = tmf8801_io.read(Register::APPREV_PATCH);
-  DBG_INFO("ROM Firmware = %d.%d.%d", app_rev_major, app_rev_minor, app_rev_patch);
-
+  {
+    uint8_t const app_rev_major = tmf8801_io.read(Register::APPREV_MAJOR);
+    uint8_t const app_rev_minor = tmf8801_io.read(Register::APPREV_MINOR);
+    uint8_t const app_rev_patch = tmf8801_io.read(Register::APPREV_PATCH);
+    DBG_INFO("ROM Firmware = %d.%d.%d", app_rev_major, app_rev_minor, app_rev_patch);
+  }
 
   /* Load bootloader stored in ROM firmware.
    */
@@ -130,6 +131,12 @@ void setup()
      */
     size_t const transfer_size = 1 + 1 + bl_cmd.field.bl_size + 1; /* COMMAND + SIZE + DATA + CSUM */
     tmf8801_io.write(Register::BL_CMD_STAT, bl_cmd.buf, transfer_size);
+    DBG_VERBOSE("(%d) C %02X | S %02X | D %02X | C %02X",
+                transfer_size,
+                bl_cmd.field.bl_cmd_stat,
+                bl_cmd.field.bl_size,
+                bl_cmd.field.bl_data[0],
+                bl_cmd.field.bl_data[bl_cmd.field.bl_size]);
   };
 
   auto bootloader_command_status = []() -> uint8_t
@@ -141,27 +148,90 @@ void setup()
   };
 
   /* Initialize TMF8801 RAM for download. */
-  BootloaderCommand download_init;
-  download_init.field.bl_cmd_stat = to_integer(BOOTLOADER_COMMAND::DOWNLOAD_INIT);
-  download_init.field.bl_size = 1;
-  download_init.field.bl_data[0] = 0x29;
+  DBG_INFO("DOWNLOAD_INIT");
+  {
+    BootloaderCommand download_init;
+    download_init.field.bl_cmd_stat = to_integer(BOOTLOADER_COMMAND::DOWNLOAD_INIT);
+    download_init.field.bl_size = 1;
+    download_init.field.bl_data[0] = 0x29;
 
-  bootloader_command_transfer(download_init);
-  bootloader_command_status();
+    bootloader_command_transfer(download_init);
+    bootloader_command_status();
+  }
 
   /* Setup address pointer. */
-  BootloaderCommand addr_ram;
-  addr_ram.field.bl_cmd_stat = to_integer(BOOTLOADER_COMMAND::ADDR_RAM);
-  addr_ram.field.bl_size = 2;
-  addr_ram.field.bl_data[0] = 0x02;
-  addr_ram.field.bl_data[1] = 0x00;
+  DBG_INFO("ADDR_RAM");
+  {
+    BootloaderCommand addr_ram;
+    addr_ram.field.bl_cmd_stat = to_integer(BOOTLOADER_COMMAND::ADDR_RAM);
+    addr_ram.field.bl_size = 2;
+    addr_ram.field.bl_data[0] = 0x02;
+    addr_ram.field.bl_data[1] = 0x00;
 
-  bootloader_command_transfer(addr_ram);
-  bootloader_command_status();
+    bootloader_command_transfer(addr_ram);
+    bootloader_command_status();
+  }
 
   /* Write firmware. */
+  DBG_INFO("W_RAM, sizeof(main_app_3v3_k2_bin) = %d bytes", sizeof(main_app_3v3_k2_bin));
+  size_t const RAM_FIRWARE_BYTES_WRITTEN_PER_TRANSFER = 16;
+  size_t bytes_written = 0;
+  for (; bytes_written < sizeof(main_app_3v3_k2_bin); bytes_written += RAM_FIRWARE_BYTES_WRITTEN_PER_TRANSFER)
+  {
+    BootloaderCommand w_ram;
+    w_ram.field.bl_cmd_stat = to_integer(BOOTLOADER_COMMAND::W_RAM);
+    w_ram.field.bl_size = 16;
+    std::copy(main_app_3v3_k2_bin + bytes_written,
+              main_app_3v3_k2_bin + bytes_written + RAM_FIRWARE_BYTES_WRITTEN_PER_TRANSFER ,
+              w_ram.field.bl_data);
+    bootloader_command_transfer(w_ram);
+    uint8_t const status = bootloader_command_status();
+    DBG_VERBOSE("%d bytes written, status = %d", bytes_written, status);
+  }
+  /* Remove last increment before the exit of the loop. */
+  bytes_written -= RAM_FIRWARE_BYTES_WRITTEN_PER_TRANSFER;
+  /* Write the remaining bytes. */
+  size_t const bytes_remaining = sizeof(main_app_3v3_k2_bin) - bytes_written;
+  DBG_VERBOSE("%d bytes remaining, %d bytes written", bytes_remaining, bytes_written);
+  if (bytes_remaining > 0)
+  {
+    BootloaderCommand w_ram;
+    w_ram.field.bl_cmd_stat = to_integer(BOOTLOADER_COMMAND::W_RAM);
+    w_ram.field.bl_size = bytes_remaining;
+    std::copy(main_app_3v3_k2_bin + bytes_written,
+              main_app_3v3_k2_bin + bytes_written + bytes_remaining,
+              w_ram.field.bl_data);
+    bootloader_command_transfer(w_ram);
+    uint8_t const status = bootloader_command_status();
+    bytes_written += bytes_remaining;
+    DBG_VERBOSE("%d bytes written, status = %d", bytes_written, status);
+  }
 
   /* RAMREMAP_RESET */
+  DBG_INFO("RAMREMAP_RESET");
+  {
+    BootloaderCommand ramremap_reset;
+    ramremap_reset.field.bl_cmd_stat = to_integer(BOOTLOADER_COMMAND::RAMREMAP_RESET);
+    ramremap_reset.field.bl_size = 0;
+
+    bootloader_command_transfer(ramremap_reset);
+    bootloader_command_status();
+  }
+
+  delay(100);
+  if (!tmf8801_io.isBitSet(Register::ENABLE, bp(ENABLE::CPU_READY))) {
+    DBG_ERROR("Error, CPU not ready after reset");
+    return;
+  }
+
+  /* Obtain major, minor, patch number of current RAM firmware.
+   */
+  {
+    uint8_t const app_rev_major = tmf8801_io.read(Register::APPREV_MAJOR);
+    uint8_t const app_rev_minor = tmf8801_io.read(Register::APPREV_MINOR);
+    uint8_t const app_rev_patch = tmf8801_io.read(Register::APPREV_PATCH);
+    DBG_INFO("RAM Firmware = %d.%d.%d", app_rev_major, app_rev_minor, app_rev_patch);
+  }
 }
 
 void loop()
