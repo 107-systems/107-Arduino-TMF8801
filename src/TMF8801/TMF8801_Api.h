@@ -51,7 +51,7 @@ class TMF8801_Api
 
 public:
 
-  TMF8801_Api(TMF8801_Io & io);
+  TMF8801_Api(TMF8801_Io & io, TMF8801::DelayFunc delay);
 
 
   /* Application independent API
@@ -78,12 +78,23 @@ public:
   void loadAlgoState(AlgoState const & algo_state);
 
 
+  /* Bootloader API
+   */
+  BOOTLOADER_STATUS bootloader_download_init();
+  BOOTLOADER_STATUS bootloader_set_address(uint16_t const addr);
+  BOOTLOADER_STATUS bootloader_write_ram(uint8_t const * ram_firmware, size_t const ram_firmware_bytes);
+  BOOTLOADER_STATUS bootloader_ramremap_reset();
+
 private:
 
   TMF8801_Io & _io;
+  TMF8801::DelayFunc _delay;
 
   static unsigned int const RESET_TIMEOUT_ms = 100;
 
+  BOOTLOADER_STATUS bootloader_command_transfer(BootloaderCommand & bl_cmd);
+  BOOTLOADER_STATUS bootloader_wait_ready();
+  BOOTLOADER_STATUS bootloader_get_status();
 };
 
 /**************************************************************************************

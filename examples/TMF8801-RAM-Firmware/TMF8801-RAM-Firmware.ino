@@ -43,7 +43,7 @@ void i2c_generic_read (uint8_t const i2c_slave_addr, uint8_t const reg_addr, uin
 DEBUG_INSTANCE(120, Serial);
 
 TMF8801_Io tmf8801_io(i2c_generic_write, i2c_generic_read, TMF8801::DEFAULT_I2C_ADDR);
-TMF8801_Api tmf8801_api(tmf8801_io);
+TMF8801_Api tmf8801_api(tmf8801_io, delay);
 
 /**************************************************************************************
  * SETUP/LOOP
@@ -54,6 +54,7 @@ void setup()
   /* Setup Serial */
   Serial.begin(9600);
   while(!Serial) { }
+
   DBG_INFO("TMF8801 RAM Firmware Upload");
 
   /* Setup Wire (I2C) */
@@ -104,115 +105,37 @@ void setup()
     return;
   }
 
-  auto bootloader_command_transfer = [](BootloaderCommand & bl_cmd)
+
+  /* Download RAM firmware to TMF8801.
+   */
+  BOOTLOADER_STATUS bl_status = BOOTLOADER_STATUS::READY;
+
+  DBG_INFO("bootloader_download_init() ...");
+  if ((bl_status = tmf8801_api.bootloader_download_init()) != BOOTLOADER_STATUS::READY)
   {
-    /* Ensure that the bl_size parameter is not
-     * larger than the array for storing it.
-     */
-    bl_cmd.field.bl_size = std::min(bl_cmd.field.bl_size, static_cast<uint8_t>(BOOTLOADER_COMMAND_MAX_DATA_SIZE));
-
-    /* Calculate checksum by iterating over all
-     * elements of the bootloader command.
-     */
-    uint8_t cs = bl_cmd.field.bl_cmd_stat;
-    cs += bl_cmd.field.bl_size;
-    std::for_each(bl_cmd.field.bl_data, bl_cmd.field.bl_data + bl_cmd.field.bl_size, [&cs](uint8_t const d) { cs += d; });
-    cs = ~cs;
-
-    /* Store the checksum at the right address in the
-     * command structure.
-     */
-    bl_cmd.field.bl_data[bl_cmd.field.bl_size] = cs;
-
-    /* Transfer the bootloader command via I2C.
-     */
-    size_t const transfer_size = 1 + 1 + bl_cmd.field.bl_size + 1; /* COMMAND + SIZE + DATA + CSUM */
-    tmf8801_io.write(Register::BL_CMD_STAT, bl_cmd.buf, transfer_size);
-    DBG_VERBOSE("(%d) C %02X | S %02X | D %02X | C %02X",
-                transfer_size,
-                bl_cmd.field.bl_cmd_stat,
-                bl_cmd.field.bl_size,
-                bl_cmd.field.bl_data[0],
-                bl_cmd.field.bl_data[bl_cmd.field.bl_size]);
-  };
-
-  auto bootloader_command_status = []() -> uint8_t
-  {
-    uint8_t buf[3] = {0};
-    tmf8801_io.read(Register::BL_CMD_STAT, buf, sizeof(buf));
-    DBG_INFO("CMD_STAT %02X SIZE %02X DATA[0] %02X", buf[0], buf[1], buf[2]);
-    return buf[0];
-  };
-
-  /* Initialize TMF8801 RAM for download. */
-  DBG_INFO("DOWNLOAD_INIT");
-  {
-    BootloaderCommand download_init;
-    download_init.field.bl_cmd_stat = to_integer(BOOTLOADER_COMMAND::DOWNLOAD_INIT);
-    download_init.field.bl_size = 1;
-    download_init.field.bl_data[0] = 0x29;
-
-    bootloader_command_transfer(download_init);
-    bootloader_command_status();
+    DBG_ERROR("bootloader_download_init() failed with %d", to_integer(bl_status));
+    return;
   }
 
-  /* Setup address pointer. */
-  DBG_INFO("ADDR_RAM");
+  DBG_INFO("bootloader_set_address() ...");
+  if ((bl_status = tmf8801_api.bootloader_set_address(0x0000)) != BOOTLOADER_STATUS::READY)
   {
-    BootloaderCommand addr_ram;
-    addr_ram.field.bl_cmd_stat = to_integer(BOOTLOADER_COMMAND::ADDR_RAM);
-    addr_ram.field.bl_size = 2;
-    addr_ram.field.bl_data[0] = 0x00;
-    addr_ram.field.bl_data[1] = 0x00;
-
-    bootloader_command_transfer(addr_ram);
-    bootloader_command_status();
+    DBG_ERROR("bootloader_set_address() failed with %d", to_integer(bl_status));
+    return;
   }
 
-  /* Write firmware. */
-  DBG_INFO("W_RAM, sizeof(main_app_3v3_k2_bin) = %d bytes", sizeof(main_app_3v3_k2_bin));
-  size_t const RAM_FIRWARE_BYTES_WRITTEN_PER_TRANSFER = 16;
-  size_t bytes_written = 0;
-  for (; bytes_written < sizeof(main_app_3v3_k2_bin); bytes_written += RAM_FIRWARE_BYTES_WRITTEN_PER_TRANSFER)
+  DBG_INFO("bootloader_write_ram() ...");
+  if ((bl_status = tmf8801_api.bootloader_write_ram(main_app_3v3_k2_bin, sizeof(main_app_3v3_k2_bin))) != BOOTLOADER_STATUS::READY)
   {
-    BootloaderCommand w_ram;
-    w_ram.field.bl_cmd_stat = to_integer(BOOTLOADER_COMMAND::W_RAM);
-    w_ram.field.bl_size = 16;
-    std::copy(main_app_3v3_k2_bin + bytes_written,
-              main_app_3v3_k2_bin + bytes_written + RAM_FIRWARE_BYTES_WRITTEN_PER_TRANSFER ,
-              w_ram.field.bl_data);
-    bootloader_command_transfer(w_ram);
-    uint8_t const status = bootloader_command_status();
-    DBG_VERBOSE("%d bytes written, status = %d", bytes_written, status);
-  }
-  /* Remove last increment before the exit of the loop. */
-  bytes_written -= RAM_FIRWARE_BYTES_WRITTEN_PER_TRANSFER;
-  /* Write the remaining bytes. */
-  size_t const bytes_remaining = sizeof(main_app_3v3_k2_bin) - bytes_written;
-  DBG_VERBOSE("%d bytes remaining, %d bytes written", bytes_remaining, bytes_written);
-  if (bytes_remaining > 0)
-  {
-    BootloaderCommand w_ram;
-    w_ram.field.bl_cmd_stat = to_integer(BOOTLOADER_COMMAND::W_RAM);
-    w_ram.field.bl_size = bytes_remaining;
-    std::copy(main_app_3v3_k2_bin + bytes_written,
-              main_app_3v3_k2_bin + bytes_written + bytes_remaining,
-              w_ram.field.bl_data);
-    bootloader_command_transfer(w_ram);
-    uint8_t const status = bootloader_command_status();
-    bytes_written += bytes_remaining;
-    DBG_VERBOSE("%d bytes written, status = %d", bytes_written, status);
+    DBG_ERROR("bootloader_write_ram() failed with %d", to_integer(bl_status));
+    return;
   }
 
-  /* RAMREMAP_RESET */
-  DBG_INFO("RAMREMAP_RESET");
+  DBG_INFO("bootloader_ramremap_reset() ...");
+  if ((bl_status = tmf8801_api.bootloader_ramremap_reset()) != BOOTLOADER_STATUS::READY)
   {
-    BootloaderCommand ramremap_reset;
-    ramremap_reset.field.bl_cmd_stat = to_integer(BOOTLOADER_COMMAND::RAMREMAP_RESET);
-    ramremap_reset.field.bl_size = 0;
-
-    bootloader_command_transfer(ramremap_reset);
-    bootloader_command_status();
+    DBG_ERROR("bootloader_ramremap_reset() failed with %d", to_integer(bl_status));
+    return;
   }
 
   delay(100);

@@ -175,6 +175,23 @@ enum class BOOTLOADER_COMMAND : uint8_t
   ADDR_RAM       = 0x43, /* Set the read/write RAM pointer to a given address */
 };
 
+enum class BOOTLOADER_STATUS : uint8_t
+{
+  READY               = 0x00, /* Bootloader is ready to receive a new command */
+  ERR_SIZE            = 0x01, /* The size field has an invalid number (e.g. Reset command must have size set to 0, any other value will lead to this error) and bootloader is ready to receive a new command */
+  ERR_CSUM            = 0x02, /* The Checksum is wrong and the bootloader is ready to receive a new command */
+  ERR_RES             = 0x03, /* The command given is not supported by the bootloader and the bootloader is ready to receive a new command. */
+  ERR_APP             = 0x04, /* Application switch not supported and the bootloader is ready to receive a new command. */
+  ERR_TIMEOUT         = 0x05, /* Timeout occurred and the bootloader is ready to receive a new command. */
+  ERR_LOCK            = 0x06, /* The command cannot be executed on an encrypted device and the bootloader is ready to receive a new command. */
+  ERR_RANGE           = 0x07, /* The specified address is out of range or the command would lead to a read/write to an out-of-bounds address and the bootloader is ready to receive a new command. */
+  ERR_MORE            = 0x08, /* The command was executed but did not lead to a success. For each command that can return this error code, the section specifies how to interpret the additional information. The bootloader is ready to receive a new command. */
+  ERROR_GENERAL_START = 0x09, /* Unspecified error and the bootloader is ready to receive a new command. */
+  ERROR_GENERAL_STOP  = 0x0F,
+  BUSY_START          = 0x10, /* Bootloader cannot receive a new command – wait for status to become READY or ERROR */
+  BUSY_STOP           = 0xFF,
+};
+
 enum class Error : int
 {
   None    =  0,
