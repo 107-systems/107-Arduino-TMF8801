@@ -42,7 +42,8 @@ void i2c_generic_read (uint8_t const i2c_slave_addr, uint8_t const reg_addr, uin
 
 DEBUG_INSTANCE(120, Serial);
 
-TMF8801::TMF8801_Io tmf8801_io(i2c_generic_write, i2c_generic_read, TMF8801::DEFAULT_I2C_ADDR);
+TMF8801_Io tmf8801_io(i2c_generic_write, i2c_generic_read, TMF8801::DEFAULT_I2C_ADDR);
+TMF8801_Api tmf8801_api(tmf8801_io);
 
 /**************************************************************************************
  * SETUP/LOOP
@@ -71,9 +72,9 @@ void setup()
 
   /* Perform a reset.
    */
-  tmf8801_io.modify(Register::ENABLE, bm(ENABLE::CPU_RESET), bm(ENABLE::CPU_RESET));
+  tmf8801_api.reset();
   delay(100);
-  if (!tmf8801_io.isBitSet(Register::ENABLE, bp(ENABLE::CPU_READY))) {
+  if (!tmf8801_api.isCpuReady()) {
     DBG_ERROR("Error, CPU not ready after reset");
     return;
   }
@@ -81,9 +82,9 @@ void setup()
 
   /* Load application stored in ROM firmware.
    */
-  tmf8801_io.write(Register::APPREQID, to_integer(APPREQID::APP));
+  tmf8801_api.loadApplication();
   delay(100);
-  if (tmf8801_io.read(Register::APPID) != to_integer(APPID::APP)) {
+  if (tmf8801_api.getCurrentApplication() != Application::Measurement) {
     DBG_ERROR("Error, could not load application");
     return;
   }
@@ -91,18 +92,14 @@ void setup()
 
   /* Obtain major, minor, patch number of current ROM firmware.
    */
-  {
-    uint8_t const app_rev_major = tmf8801_io.read(Register::APPREV_MAJOR);
-    uint8_t const app_rev_minor = tmf8801_io.read(Register::APPREV_MINOR);
-    uint8_t const app_rev_patch = tmf8801_io.read(Register::APPREV_PATCH);
-    DBG_INFO("ROM Firmware = %d.%d.%d", app_rev_major, app_rev_minor, app_rev_patch);
-  }
+  DBG_INFO("ROM Firmware = %d.%d.%d", tmf8801_api.getAppRevisionMajor(), tmf8801_api.getAppRevisionMinor(), tmf8801_api.getAppRevisionPatch());
+
 
   /* Load bootloader stored in ROM firmware.
    */
-  tmf8801_io.write(Register::APPREQID, to_integer(APPREQID::BOOTLOADER));
+  tmf8801_api.loadBootloader();
   delay(100);
-  if (tmf8801_io.read(Register::APPID) != to_integer(APPID::BOOTLOADER)) {
+  if (tmf8801_api.getCurrentApplication() != Application::Bootloader) {
     DBG_ERROR("Error, could not load bootloader");
     return;
   }
@@ -219,19 +216,14 @@ void setup()
   }
 
   delay(100);
-  if (!tmf8801_io.isBitSet(Register::ENABLE, bp(ENABLE::CPU_READY))) {
+  if (!tmf8801_api.isCpuReady()) {
     DBG_ERROR("Error, CPU not ready after reset");
     return;
   }
 
   /* Obtain major, minor, patch number of current RAM firmware.
    */
-  {
-    uint8_t const app_rev_major = tmf8801_io.read(Register::APPREV_MAJOR);
-    uint8_t const app_rev_minor = tmf8801_io.read(Register::APPREV_MINOR);
-    uint8_t const app_rev_patch = tmf8801_io.read(Register::APPREV_PATCH);
-    DBG_INFO("RAM Firmware = %d.%d.%d", app_rev_major, app_rev_minor, app_rev_patch);
-  }
+  DBG_INFO("RAM Firmware = %d.%d.%d", tmf8801_api.getAppRevisionMajor(), tmf8801_api.getAppRevisionMinor(), tmf8801_api.getAppRevisionPatch());
 }
 
 void loop()

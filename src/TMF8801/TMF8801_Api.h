@@ -78,7 +78,9 @@ public:
   bool            isCpuReady();
   Application     getCurrentApplication();
   RegisterContent getRegisterContent();
-
+  uint8_t         getAppRevisionMajor();
+  uint8_t         getAppRevisionMinor();
+  uint8_t         getAppRevisionPatch();
 
 private:
 

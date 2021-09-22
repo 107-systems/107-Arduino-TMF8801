@@ -127,6 +127,21 @@ RegisterContent TMF8801_Api::getRegisterContent()
     return RegisterContent::Unknown;
 }
 
+uint8_t TMF8801_Api::getAppRevisionMajor()
+{
+  return _io.read(Register::APPREV_MAJOR);
+}
+
+uint8_t TMF8801_Api::getAppRevisionMinor()
+{
+  return _io.read(Register::APPREV_MINOR);
+}
+
+uint8_t TMF8801_Api::getAppRevisionPatch()
+{
+  return _io.read(Register::APPREV_PATCH);
+}
+
 /**************************************************************************************
  * NAMESPACE
  **************************************************************************************/
