@@ -170,7 +170,7 @@ bool ArduinoTMF8801::waitForApplication()
   for (; t < APP_LOADED_TIMEOUT_ms; t += APP_LOADED_TIMEOUT_INCREMENT_ms)
   {
     _delay(APP_LOADED_TIMEOUT_INCREMENT_ms);
-    if (_api.currentApplication() == TMF8801::Application::Measurement)
+    if (_api.getCurrentApplication() == TMF8801::Application::Measurement)
       return true;
   }
 

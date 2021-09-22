@@ -99,7 +99,7 @@ bool TMF8801_Api::isCpuReady()
   return _io.isBitSet(Register::ENABLE, bp(ENABLE::CPU_READY));
 }
 
-Application TMF8801_Api::currentApplication()
+Application TMF8801_Api::getCurrentApplication()
 {
   uint8_t const appid_val = _io.read(Register::APPID);
 

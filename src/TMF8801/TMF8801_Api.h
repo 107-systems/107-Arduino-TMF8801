@@ -72,10 +72,11 @@ public:
   void loadCalibData(CalibData const & calib_data);
   void loadAlgoState(AlgoState const & algo_state);
 
+
   /* Status
    */
   bool            isCpuReady();
-  Application     currentApplication();
+  Application     getCurrentApplication();
   RegisterContent getRegisterContent();
 
 
