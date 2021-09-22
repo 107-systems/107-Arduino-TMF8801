@@ -32,16 +32,13 @@ ArduinoTMF8801::ArduinoTMF8801(TMF8801::I2cWriteFunc write,
                                TMF8801::AlgoState const & algo_state,
                                OnLengthDataUpdateFunc func)
 : LengthSensorBase("TMF8801",
-                           2.5000 * unit::meter,
-                           0.0020 * unit::meter,
-                           0.0    * unit::hertz,
-                           func)
+                   2.5000 * unit::meter,
+                   0.0020 * unit::meter,
+                   0.0    * unit::hertz,
+                   func)
 , _error{TMF8801::Error::None}
 , _io{write, read, i2c_slave_addr}
-, _delay{delay}
-, _config{_io}
-, _ctrl{_io}
-, _status{_io}
+, _api{_io, delay}
 , _calib_data{calib_data}
 , _algo_state{algo_state}
 {
@@ -57,8 +54,7 @@ bool ArduinoTMF8801::begin(uint8_t const measurement_period_ms)
   /* Reset the board and wait for the board to come up again
    * within a predefined time period.
    */
-  _ctrl.reset();
-  if (!waitForCpuReady())
+  if ((_error = _api.reset()) != TMF8801::Error::None)
     return false;
 
   /* Check the CHIP ID if it matches the expected value.
@@ -71,19 +67,18 @@ bool ArduinoTMF8801::begin(uint8_t const measurement_period_ms)
   /* Load the measurement application and verify if the
    * measurement application has been successfully loaded.
    */
-  _ctrl.loadApplication();
-  if (!waitForApplication())
+  if ((_error = _api.loadApplication()) != TMF8801::Error::None)
     return false;
 
   _io.write(TMF8801::Register::COMMAND, TMF8801::to_integer(TMF8801::COMMAND::DOWNLOAD_CALIB_AND_STATE));
-  _config.loadCalibData(_calib_data);
-  _config.loadAlgoState(_algo_state);
+  _api.application_loadCalibData(_calib_data);
+  _api.application_loadAlgoState(_algo_state);
 
   /* Clear the interrupt to remove any remaining pending artefacts
    * then enable the interrupt for a new distance measurement available.
    */
-  _ctrl.clearInterrupt (TMF8801::InterruptSource::ObjectDectectionAvailable);
-  _ctrl.enableInterrupt(TMF8801::InterruptSource::ObjectDectectionAvailable);
+  _api.clearInterrupt (TMF8801::InterruptSource::ObjectDectectionAvailable);
+  _api.enableInterrupt(TMF8801::InterruptSource::ObjectDectectionAvailable);
 
   /* Configure TMF8801 according to TMF8X0X Host Driver Communication:
    * Use above configuration and configure for continuous mode, period
@@ -113,11 +108,11 @@ bool ArduinoTMF8801::begin(uint8_t const measurement_period_ms)
 void ArduinoTMF8801::onExternalEventHandler()
 {
   /* Clear the interrupt flag. */
-  _ctrl.clearInterrupt(TMF8801::InterruptSource::ObjectDectectionAvailable);
+  _api.clearInterrupt(TMF8801::InterruptSource::ObjectDectectionAvailable);
 
   /* Obtain distance data. */
   TMF8801::ObjectDetectionData data;
-  _ctrl.readObjectDetectionResult(data);
+  _api.application_readObjectDetectionResult(data);
   _distance = (data.field.distance_peak_0_mm / 1000.0) * unit::meter;
 
   /* Invoke new ensor data update callback. */
@@ -137,48 +132,6 @@ void ArduinoTMF8801::clearerr()
 TMF8801::Error ArduinoTMF8801::error()
 {
   return _error;
-}
-
-/**************************************************************************************
- * PRIVATE MEMBER FUNCTIONS
- **************************************************************************************/
-
-bool ArduinoTMF8801::waitForCpuReady()
-{
-  static unsigned int constexpr CPU_READY_TIMEOUT_ms = 100;
-  static unsigned int constexpr CPU_READY_TIMEOUT_INCREMENT_ms = 10;
-
-  /* Poll ENABLE::CPU_READY to determine if sensor is available again (ENABLE::CPU_READY = '1'). */
-  unsigned int t = 0;
-  for (; t < CPU_READY_TIMEOUT_ms; t += CPU_READY_TIMEOUT_INCREMENT_ms)
-  {
-    _delay(CPU_READY_TIMEOUT_INCREMENT_ms);
-    if (_status.isCpuReady())
-      return true;
-  }
-
-  /* A timeout has occurred. */
-  _error = TMF8801::Error::Timeout;
-  return false;
-}
-
-bool ArduinoTMF8801::waitForApplication()
-{
-  static unsigned int constexpr APP_LOADED_TIMEOUT_ms = 100;
-  static unsigned int constexpr APP_LOADED_TIMEOUT_INCREMENT_ms = 10;
-
-  /* Poll ENABLE::CPU_READY to determine if sensor is available again (ENABLE::CPU_READY = '1'). */
-  unsigned int t = 0;
-  for (; t < APP_LOADED_TIMEOUT_ms; t += APP_LOADED_TIMEOUT_INCREMENT_ms)
-  {
-    _delay(APP_LOADED_TIMEOUT_INCREMENT_ms);
-    if (_status.currentApplication() == TMF8801::Application::Measurement)
-      return true;
-  }
-
-  /* A timeout has occurred. */
-  _error = TMF8801::Error::Timeout;
-  return false;
 }
 
 /**************************************************************************************

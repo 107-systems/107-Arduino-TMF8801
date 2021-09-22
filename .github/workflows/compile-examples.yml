@@ -21,6 +21,7 @@ jobs:
       LIBRARIES: |
         # Install the library from the local path.
         - source-path: ./
+        - name: 107-Arduino-Debug
         - name: 107-Arduino-Sensor
         - name: 107-Arduino-BoostUnits
 

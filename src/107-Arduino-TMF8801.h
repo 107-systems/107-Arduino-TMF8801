@@ -19,11 +19,11 @@
 #include <functional>
 
 #include "TMF8801/TMF8801_Io.h"
+#include "TMF8801/TMF8801_Api.h"
 #include "TMF8801/TMF8801_Const.h"
 #include "TMF8801/TMF8801_Types.h"
-#include "TMF8801/TMF8801_Config.h"
-#include "TMF8801/TMF8801_Status.h"
-#include "TMF8801/TMF8801_Control.h"
+
+#include "TMF8801/firmware/main_app_3v3_k2.h"
 
 /**************************************************************************************
  * NAMESPACE
@@ -70,16 +70,11 @@ private:
 
   TMF8801::Error _error;
   TMF8801::TMF8801_Io _io;
-  TMF8801::DelayFunc _delay;
-  TMF8801::TMF8801_Config _config;
-  TMF8801::TMF8801_Control _ctrl;
-  TMF8801::TMF8801_Status _status;
+  TMF8801::TMF8801_Api _api;
   TMF8801::CalibData const & _calib_data;
   TMF8801::AlgoState const & _algo_state;
   unit::Length _distance;
 
-  bool waitForCpuReady();
-  bool waitForApplication();
 };
 
 /**************************************************************************************

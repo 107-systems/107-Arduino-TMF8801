@@ -50,6 +50,20 @@ union ObjectDetectionData
   static_assert(sizeof(buf) == 4, "Error, ObjectDetectionData size does not match expectation");
 };
 
+static size_t constexpr BOOTLOADER_COMMAND_MAX_DATA_SIZE = 128;
+union BootloaderCommand
+{
+  struct __attribute__((packed))
+  {
+    uint8_t bl_cmd_stat;
+    uint8_t bl_size;
+    uint8_t bl_data[BOOTLOADER_COMMAND_MAX_DATA_SIZE];
+    uint8_t bl_csum;
+  } field;
+  uint8_t buf[sizeof(field)];
+  static_assert(sizeof(buf) == 131, "Error, BootloaderCommand size should be 131");
+};
+
 /**************************************************************************************
  * NAMESPACE
  **************************************************************************************/
