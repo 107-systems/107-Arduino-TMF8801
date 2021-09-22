@@ -54,14 +54,38 @@ Error TMF8801_Api::reset()
   return Error::Timeout;
 }
 
-void TMF8801_Api::loadApplication()
+Error TMF8801_Api::loadApplication()
 {
   _io.write(Register::APPREQID, to_integer(APPREQID::APP));
+
+  static size_t constexpr APP_LOADED_TIMEOUT_ms = 100;
+  static size_t constexpr APP_LOADED_TIMEOUT_INCREMENT_ms = 10;
+
+  for (size_t t = 0; t < APP_LOADED_TIMEOUT_ms; t += APP_LOADED_TIMEOUT_INCREMENT_ms)
+  {
+    _delay(APP_LOADED_TIMEOUT_INCREMENT_ms);
+    if (getCurrentApplication() == TMF8801::Application::Measurement)
+      return Error::None;
+  }
+
+  return Error::Timeout;
 }
 
-void TMF8801_Api::loadBootloader()
+Error TMF8801_Api::loadBootloader()
 {
   _io.write(Register::APPREQID, to_integer(APPREQID::BOOTLOADER));
+
+  static size_t constexpr BOOTLOADER_LOADED_TIMEOUT_ms = 100;
+  static size_t constexpr BOOTLOADER_LOADED_TIMEOUT_INCREMENT_ms = 10;
+
+  for (size_t t = 0; t < BOOTLOADER_LOADED_TIMEOUT_ms; t += BOOTLOADER_LOADED_TIMEOUT_INCREMENT_ms)
+  {
+    _delay(BOOTLOADER_LOADED_TIMEOUT_INCREMENT_ms);
+    if (getCurrentApplication() == TMF8801::Application::Bootloader)
+      return Error::None;
+  }
+
+  return Error::Timeout;
 }
 
 void TMF8801_Api::clearInterrupt(InterruptSource const src)

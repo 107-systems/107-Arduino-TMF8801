@@ -57,8 +57,8 @@ public:
   /* Application independent API
    */
   Error           reset();
-  void            loadApplication();
-  void            loadBootloader();
+  Error           loadApplication();
+  Error           loadBootloader();
   void            clearInterrupt(InterruptSource const src);
   void            enableInterrupt(InterruptSource const src);
   void            disableInterrupt(InterruptSource const src);

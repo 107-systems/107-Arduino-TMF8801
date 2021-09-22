@@ -68,8 +68,7 @@ bool ArduinoTMF8801::begin(uint8_t const measurement_period_ms)
   /* Load the measurement application and verify if the
    * measurement application has been successfully loaded.
    */
-  _api.loadApplication();
-  if (!waitForApplication())
+  if ((_error = _api.loadApplication()) != TMF8801::Error::None)
     return false;
 
   _io.write(TMF8801::Register::COMMAND, TMF8801::to_integer(TMF8801::COMMAND::DOWNLOAD_CALIB_AND_STATE));
@@ -134,29 +133,6 @@ void ArduinoTMF8801::clearerr()
 TMF8801::Error ArduinoTMF8801::error()
 {
   return _error;
-}
-
-/**************************************************************************************
- * PRIVATE MEMBER FUNCTIONS
- **************************************************************************************/
-
-bool ArduinoTMF8801::waitForApplication()
-{
-  static unsigned int constexpr APP_LOADED_TIMEOUT_ms = 100;
-  static unsigned int constexpr APP_LOADED_TIMEOUT_INCREMENT_ms = 10;
-
-  /* Poll ENABLE::CPU_READY to determine if sensor is available again (ENABLE::CPU_READY = '1'). */
-  unsigned int t = 0;
-  for (; t < APP_LOADED_TIMEOUT_ms; t += APP_LOADED_TIMEOUT_INCREMENT_ms)
-  {
-    _delay(APP_LOADED_TIMEOUT_INCREMENT_ms);
-    if (_api.getCurrentApplication() == TMF8801::Application::Measurement)
-      return true;
-  }
-
-  /* A timeout has occurred. */
-  _error = TMF8801::Error::Timeout;
-  return false;
 }
 
 /**************************************************************************************

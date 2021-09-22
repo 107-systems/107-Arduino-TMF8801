@@ -76,7 +76,6 @@ private:
   TMF8801::AlgoState const & _algo_state;
   unit::Length _distance;
 
-  bool waitForApplication();
 };
 
 /**************************************************************************************

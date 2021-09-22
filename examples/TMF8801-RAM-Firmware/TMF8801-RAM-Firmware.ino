@@ -83,10 +83,9 @@ void setup()
 
   /* Load application stored in ROM firmware.
    */
-  tmf8801_api.loadApplication();
-  delay(100);
-  if (tmf8801_api.getCurrentApplication() != Application::Measurement) {
-    DBG_ERROR("Error, could not load application");
+  if ((error = tmf8801_api.loadApplication()) != Error::None)
+  {
+    DBG_ERROR("loadApplication() failed with %d", to_integer(error));
     return;
   }
 
@@ -98,10 +97,9 @@ void setup()
 
   /* Load bootloader stored in ROM firmware.
    */
-  tmf8801_api.loadBootloader();
-  delay(100);
-  if (tmf8801_api.getCurrentApplication() != Application::Bootloader) {
-    DBG_ERROR("Error, could not load bootloader");
+  if ((error = tmf8801_api.loadBootloader()) != Error::None)
+  {
+    DBG_ERROR("loadBootloader() failed with %d", to_integer(error));
     return;
   }
 
