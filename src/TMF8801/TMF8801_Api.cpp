@@ -37,9 +37,21 @@ TMF8801_Api::TMF8801_Api(TMF8801_Io & io, TMF8801::DelayFunc delay)
  * PUBLIC MEMBER FUNCTIONS
  **************************************************************************************/
 
-void TMF8801_Api::reset()
+Error TMF8801_Api::reset()
 {
   _io.modify(Register::ENABLE, bm(ENABLE::CPU_RESET), bm(ENABLE::CPU_RESET));
+
+  static size_t constexpr CPU_READY_TIMEOUT_ms = 100;
+  static size_t constexpr CPU_READY_TIMEOUT_INCREMENT_ms = 10;
+
+  for (unsigned int t = 0; t < CPU_READY_TIMEOUT_ms; t += CPU_READY_TIMEOUT_INCREMENT_ms)
+  {
+    _delay(CPU_READY_TIMEOUT_INCREMENT_ms);
+    if (_io.isBitSet(Register::ENABLE, bp(ENABLE::CPU_READY)))
+      return Error::None;
+  }
+
+  return Error::Timeout;
 }
 
 void TMF8801_Api::loadApplication()
@@ -74,11 +86,6 @@ void TMF8801_Api::disableInterrupt(InterruptSource const src)
     _io.modify(Register::INT_ENAB, bm(INT_ENAB::INT1), 0);
   else
     _io.modify(Register::INT_ENAB, bm(INT_ENAB::INT2), 0);
-}
-
-bool TMF8801_Api::isCpuReady()
-{
-  return _io.isBitSet(Register::ENABLE, bp(ENABLE::CPU_READY));
 }
 
 Application TMF8801_Api::getCurrentApplication()

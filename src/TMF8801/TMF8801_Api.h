@@ -56,14 +56,13 @@ public:
 
   /* Application independent API
    */
-  void            reset();
+  Error           reset();
   void            loadApplication();
   void            loadBootloader();
   void            clearInterrupt(InterruptSource const src);
   void            enableInterrupt(InterruptSource const src);
   void            disableInterrupt(InterruptSource const src);
 
-  bool            isCpuReady();
   Application     getCurrentApplication();
   RegisterContent getRegisterContent();
   uint8_t         getAppRevisionMajor();
@@ -89,8 +88,6 @@ private:
 
   TMF8801_Io & _io;
   TMF8801::DelayFunc _delay;
-
-  static unsigned int const RESET_TIMEOUT_ms = 100;
 
   BOOTLOADER_STATUS bootloader_command_transfer(BootloaderCommand & bl_cmd);
   BOOTLOADER_STATUS bootloader_wait_ready();

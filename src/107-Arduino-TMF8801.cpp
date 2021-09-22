@@ -55,8 +55,7 @@ bool ArduinoTMF8801::begin(uint8_t const measurement_period_ms)
   /* Reset the board and wait for the board to come up again
    * within a predefined time period.
    */
-  _api.reset();
-  if (!waitForCpuReady())
+  if ((_error = _api.reset()) != TMF8801::Error::None)
     return false;
 
   /* Check the CHIP ID if it matches the expected value.
@@ -140,25 +139,6 @@ TMF8801::Error ArduinoTMF8801::error()
 /**************************************************************************************
  * PRIVATE MEMBER FUNCTIONS
  **************************************************************************************/
-
-bool ArduinoTMF8801::waitForCpuReady()
-{
-  static unsigned int constexpr CPU_READY_TIMEOUT_ms = 100;
-  static unsigned int constexpr CPU_READY_TIMEOUT_INCREMENT_ms = 10;
-
-  /* Poll ENABLE::CPU_READY to determine if sensor is available again (ENABLE::CPU_READY = '1'). */
-  unsigned int t = 0;
-  for (; t < CPU_READY_TIMEOUT_ms; t += CPU_READY_TIMEOUT_INCREMENT_ms)
-  {
-    _delay(CPU_READY_TIMEOUT_INCREMENT_ms);
-    if (_api.isCpuReady())
-      return true;
-  }
-
-  /* A timeout has occurred. */
-  _error = TMF8801::Error::Timeout;
-  return false;
-}
 
 bool ArduinoTMF8801::waitForApplication()
 {

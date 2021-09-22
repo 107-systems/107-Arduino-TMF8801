@@ -73,10 +73,10 @@ void setup()
 
   /* Perform a reset.
    */
-  tmf8801_api.reset();
-  delay(100);
-  if (!tmf8801_api.isCpuReady()) {
-    DBG_ERROR("Error, CPU not ready after reset");
+  Error error = Error::None;
+  if ((error = tmf8801_api.reset()) != Error::None)
+  {
+    DBG_ERROR("reset() failed with %d", to_integer(error));
     return;
   }
 
@@ -138,11 +138,6 @@ void setup()
     return;
   }
 
-  delay(100);
-  if (!tmf8801_api.isCpuReady()) {
-    DBG_ERROR("Error, CPU not ready after reset");
-    return;
-  }
 
   /* Obtain major, minor, patch number of current RAM firmware.
    */
