@@ -70,7 +70,6 @@ private:
 
   TMF8801::Error _error;
   TMF8801::TMF8801_Io _io;
-  TMF8801::DelayFunc _delay;
   TMF8801::TMF8801_Api _api;
   TMF8801::CalibData const & _calib_data;
   TMF8801::AlgoState const & _algo_state;

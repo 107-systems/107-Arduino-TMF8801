@@ -38,7 +38,6 @@ ArduinoTMF8801::ArduinoTMF8801(TMF8801::I2cWriteFunc write,
                    func)
 , _error{TMF8801::Error::None}
 , _io{write, read, i2c_slave_addr}
-, _delay{delay}
 , _api{_io, delay}
 , _calib_data{calib_data}
 , _algo_state{algo_state}
