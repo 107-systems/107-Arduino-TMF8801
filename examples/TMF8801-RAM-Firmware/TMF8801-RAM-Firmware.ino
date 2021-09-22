@@ -165,7 +165,7 @@ void setup()
     BootloaderCommand addr_ram;
     addr_ram.field.bl_cmd_stat = to_integer(BOOTLOADER_COMMAND::ADDR_RAM);
     addr_ram.field.bl_size = 2;
-    addr_ram.field.bl_data[0] = 0x02;
+    addr_ram.field.bl_data[0] = 0x00;
     addr_ram.field.bl_data[1] = 0x00;
 
     bootloader_command_transfer(addr_ram);
