@@ -106,46 +106,30 @@ void setup()
     return;
   }
 
-  auto bootloader_checksum_func = [](BootloaderCommand_SingleParameter const & bl_cmd) -> uint8_t
+  auto bootloader_command_transfer = [](BootloaderCommand & bl_cmd)
   {
+    /* Ensure that the bl_size parameter is not
+     * larger than the array for storing it.
+     */
+    bl_cmd.field.bl_size = std::min(bl_cmd.field.bl_size, static_cast<uint8_t>(BOOTLOADER_COMMAND_MAX_DATA_SIZE));
+
+    /* Calculate checksum by iterating over all
+     * elements of the bootloader command.
+     */
     uint8_t cs = bl_cmd.field.bl_cmd_stat;
     cs += bl_cmd.field.bl_size;
-    cs += bl_cmd.field.bl_data;
-    cs ^= 0xFF;
-    return cs;
-  };
+    std::for_each(bl_cmd.field.bl_data, bl_cmd.field.bl_data + bl_cmd.field.bl_size, [&cs](uint8_t const d) { cs += d; });
+    cs = ~cs;
 
-  auto bootloader_checksum_func_2 = [](BootloaderCommand_DualParameter const & bl_cmd) -> uint8_t
-  {
-    uint8_t cs = bl_cmd.field.bl_cmd_stat;
-    cs += bl_cmd.field.bl_size;
-    cs += bl_cmd.field.bl_data_0;
-    cs += bl_cmd.field.bl_data_1;
-    cs ^= 0xFF;
-    return cs;
-  };
+    /* Store the checksum at the right address in the
+     * command structure.
+     */
+    bl_cmd.field.bl_data[bl_cmd.field.bl_size] = cs;
 
-  auto bootloader_command_func = [](BootloaderCommand_SingleParameter const & bl_cmd)
-  {
-    tmf8801_io.write(Register::BL_CMD_STAT, bl_cmd.buf, sizeof(bl_cmd.buf));
-    
-    DBG_INFO("CMD_STAT %02X SIZE %02X DATA[0] %02X CSUM %02X",
-             bl_cmd.field.bl_cmd_stat,
-             bl_cmd.field.bl_size,
-             bl_cmd.field.bl_data,
-             bl_cmd.field.bl_csum);
-  };
-
-  auto bootloader_command_func_2 = [](BootloaderCommand_DualParameter const & bl_cmd)
-  {
-    tmf8801_io.write(Register::BL_CMD_STAT, bl_cmd.buf, sizeof(bl_cmd.buf));
-    
-    DBG_INFO("CMD_STAT %02X SIZE %02X DATA[0] %02X DATA[1] %02X CSUM %02X",
-             bl_cmd.field.bl_cmd_stat,
-             bl_cmd.field.bl_size,
-             bl_cmd.field.bl_data_0,
-             bl_cmd.field.bl_data_1,
-             bl_cmd.field.bl_csum);
+    /* Transfer the bootloader command via I2C.
+     */
+    size_t const transfer_size = 1 + 1 + bl_cmd.field.bl_size + 1; /* COMMAND + SIZE + DATA + CSUM */
+    tmf8801_io.write(Register::BL_CMD_STAT, bl_cmd.buf, transfer_size);
   };
 
   auto bootloader_command_status = []() -> uint8_t
@@ -157,24 +141,22 @@ void setup()
   };
 
   /* Initialize TMF8801 RAM for download. */
-  BootloaderCommand_SingleParameter BOOTLOADER_COMMAND_DOWNLOAD_INIT;
-  BOOTLOADER_COMMAND_DOWNLOAD_INIT.field.bl_cmd_stat = to_integer(BOOTLOADER_COMMAND::DOWNLOAD_INIT);
-  BOOTLOADER_COMMAND_DOWNLOAD_INIT.field.bl_size = 1;
-  BOOTLOADER_COMMAND_DOWNLOAD_INIT.field.bl_data = 0x29;
-  BOOTLOADER_COMMAND_DOWNLOAD_INIT.field.bl_csum = bootloader_checksum_func(BOOTLOADER_COMMAND_DOWNLOAD_INIT);
+  BootloaderCommand download_init;
+  download_init.field.bl_cmd_stat = to_integer(BOOTLOADER_COMMAND::DOWNLOAD_INIT);
+  download_init.field.bl_size = 1;
+  download_init.field.bl_data[0] = 0x29;
 
-  bootloader_command_func(BOOTLOADER_COMMAND_DOWNLOAD_INIT);
+  bootloader_command_transfer(download_init);
   bootloader_command_status();
 
   /* Setup address pointer. */
-  BootloaderCommand_DualParameter BOOTLOADER_COMMAND_ADDR_RAM;
-  BOOTLOADER_COMMAND_ADDR_RAM.field.bl_cmd_stat = to_integer(BOOTLOADER_COMMAND::ADDR_RAM);
-  BOOTLOADER_COMMAND_ADDR_RAM.field.bl_size = 2;
-  BOOTLOADER_COMMAND_ADDR_RAM.field.bl_data_0 = 0x02;
-  BOOTLOADER_COMMAND_ADDR_RAM.field.bl_data_1 = 0x00;
-  BOOTLOADER_COMMAND_ADDR_RAM.field.bl_csum = bootloader_checksum_func_2(BOOTLOADER_COMMAND_ADDR_RAM);
+  BootloaderCommand addr_ram;
+  addr_ram.field.bl_cmd_stat = to_integer(BOOTLOADER_COMMAND::ADDR_RAM);
+  addr_ram.field.bl_size = 2;
+  addr_ram.field.bl_data[0] = 0x02;
+  addr_ram.field.bl_data[1] = 0x00;
 
-  bootloader_command_func_2(BOOTLOADER_COMMAND_ADDR_RAM);
+  bootloader_command_transfer(addr_ram);
   bootloader_command_status();
 
   /* Write firmware. */
