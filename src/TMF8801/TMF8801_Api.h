@@ -54,33 +54,29 @@ public:
   TMF8801_Api(TMF8801_Io & io);
 
 
-  /* Control
+  /* Application independent API
    */
-  void reset          ();
-  void loadApplication();
-  void loadBootloader ();
+  void            reset();
+  void            loadApplication();
+  void            loadBootloader();
+  void            clearInterrupt(InterruptSource const src);
+  void            enableInterrupt(InterruptSource const src);
+  void            disableInterrupt(InterruptSource const src);
 
-  void clearInterrupt  (InterruptSource const src);
-  void enableInterrupt (InterruptSource const src);
-  void disableInterrupt(InterruptSource const src);
-
-  void readObjectDetectionResult(ObjectDetectionData & data);
-
-
-  /* Configuration
-   */
-  void loadCalibData(CalibData const & calib_data);
-  void loadAlgoState(AlgoState const & algo_state);
-
-
-  /* Status
-   */
   bool            isCpuReady();
   Application     getCurrentApplication();
   RegisterContent getRegisterContent();
   uint8_t         getAppRevisionMajor();
   uint8_t         getAppRevisionMinor();
   uint8_t         getAppRevisionPatch();
+
+
+  /* Application API
+   */
+  void readObjectDetectionResult(ObjectDetectionData & data);
+  void loadCalibData(CalibData const & calib_data);
+  void loadAlgoState(AlgoState const & algo_state);
+
 
 private:
 
