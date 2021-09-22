@@ -88,6 +88,11 @@ enum class Register : uint8_t
   INT_ENAB               = 0xE2,
   ID                     = 0xE3,
   REVID                  = 0xE4,
+
+  BL_CMD_STAT            = 0x08,
+  BL_SIZE                = 0x09,
+  BL_DATA                = 0x0A,
+  BL_CSUM                = 0x0B,
 };
 
 enum class APPID : uint8_t
@@ -160,6 +165,14 @@ enum class INT_ENAB : uint8_t
 {
   INT1 = 0,
   INT2 = 1,
+};
+
+enum class BOOTLOADER_COMMAND : uint8_t
+{
+  RAMREMAP_RESET = 0x11, /* Remap RAM to Address 0 and Reset */
+  DOWNLOAD_INIT  = 0x14, /* Initialize for RAM download from host to TMF8801 */
+  W_RAM          = 0x41, /* Write RAM Region (Plain = not encoded into e.g. Intel Hex Records) */
+  ADDR_RAM       = 0x43, /* Set the read/write RAM pointer to a given address */
 };
 
 enum class Error : int
