@@ -72,8 +72,8 @@ bool ArduinoTMF8801::begin(uint8_t const measurement_period_ms)
     return false;
 
   _io.write(TMF8801::Register::COMMAND, TMF8801::to_integer(TMF8801::COMMAND::DOWNLOAD_CALIB_AND_STATE));
-  _api.loadCalibData(_calib_data);
-  _api.loadAlgoState(_algo_state);
+  _api.application_loadCalibData(_calib_data);
+  _api.application_loadAlgoState(_algo_state);
 
   /* Clear the interrupt to remove any remaining pending artefacts
    * then enable the interrupt for a new distance measurement available.
@@ -113,7 +113,7 @@ void ArduinoTMF8801::onExternalEventHandler()
 
   /* Obtain distance data. */
   TMF8801::ObjectDetectionData data;
-  _api.readObjectDetectionResult(data);
+  _api.application_readObjectDetectionResult(data);
   _distance = (data.field.distance_peak_0_mm / 1000.0) * unit::meter;
 
   /* Invoke new ensor data update callback. */

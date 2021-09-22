@@ -155,17 +155,17 @@ uint8_t TMF8801_Api::getAppRevisionPatch()
   return _io.read(Register::APPREV_PATCH);
 }
 
-void TMF8801_Api::readObjectDetectionResult(ObjectDetectionData & data)
+void TMF8801_Api::application_readObjectDetectionResult(ObjectDetectionData & data)
 {
   _io.read(Register::RESULT_NUMBER, data.buf, sizeof(data.buf));
 }
 
-void TMF8801_Api::loadCalibData(CalibData const & calib_data)
+void TMF8801_Api::application_loadCalibData(CalibData const & calib_data)
 {
   _io.write(Register::FACTORY_CALIB_0, calib_data.data(), calib_data.size());
 }
 
-void TMF8801_Api::loadAlgoState(AlgoState const & algo_state)
+void TMF8801_Api::application_loadAlgoState(AlgoState const & algo_state)
 {
   _io.write(Register::STATE_DATA_WR_0, algo_state.data(), algo_state.size());
 }
