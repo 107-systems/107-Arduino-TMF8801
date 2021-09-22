@@ -39,7 +39,7 @@ ArduinoTMF8801::ArduinoTMF8801(TMF8801::I2cWriteFunc write,
 , _error{TMF8801::Error::None}
 , _io{write, read, i2c_slave_addr}
 , _delay{delay}
-, _ctrl{_io}
+, _api{_io}
 , _calib_data{calib_data}
 , _algo_state{algo_state}
 {
@@ -55,7 +55,7 @@ bool ArduinoTMF8801::begin(uint8_t const measurement_period_ms)
   /* Reset the board and wait for the board to come up again
    * within a predefined time period.
    */
-  _ctrl.reset();
+  _api.reset();
   if (!waitForCpuReady())
     return false;
 
@@ -69,19 +69,19 @@ bool ArduinoTMF8801::begin(uint8_t const measurement_period_ms)
   /* Load the measurement application and verify if the
    * measurement application has been successfully loaded.
    */
-  _ctrl.loadApplication();
+  _api.loadApplication();
   if (!waitForApplication())
     return false;
 
   _io.write(TMF8801::Register::COMMAND, TMF8801::to_integer(TMF8801::COMMAND::DOWNLOAD_CALIB_AND_STATE));
-  _ctrl.loadCalibData(_calib_data);
-  _ctrl.loadAlgoState(_algo_state);
+  _api.loadCalibData(_calib_data);
+  _api.loadAlgoState(_algo_state);
 
   /* Clear the interrupt to remove any remaining pending artefacts
    * then enable the interrupt for a new distance measurement available.
    */
-  _ctrl.clearInterrupt (TMF8801::InterruptSource::ObjectDectectionAvailable);
-  _ctrl.enableInterrupt(TMF8801::InterruptSource::ObjectDectectionAvailable);
+  _api.clearInterrupt (TMF8801::InterruptSource::ObjectDectectionAvailable);
+  _api.enableInterrupt(TMF8801::InterruptSource::ObjectDectectionAvailable);
 
   /* Configure TMF8801 according to TMF8X0X Host Driver Communication:
    * Use above configuration and configure for continuous mode, period
@@ -111,11 +111,11 @@ bool ArduinoTMF8801::begin(uint8_t const measurement_period_ms)
 void ArduinoTMF8801::onExternalEventHandler()
 {
   /* Clear the interrupt flag. */
-  _ctrl.clearInterrupt(TMF8801::InterruptSource::ObjectDectectionAvailable);
+  _api.clearInterrupt(TMF8801::InterruptSource::ObjectDectectionAvailable);
 
   /* Obtain distance data. */
   TMF8801::ObjectDetectionData data;
-  _ctrl.readObjectDetectionResult(data);
+  _api.readObjectDetectionResult(data);
   _distance = (data.field.distance_peak_0_mm / 1000.0) * unit::meter;
 
   /* Invoke new ensor data update callback. */
@@ -151,7 +151,7 @@ bool ArduinoTMF8801::waitForCpuReady()
   for (; t < CPU_READY_TIMEOUT_ms; t += CPU_READY_TIMEOUT_INCREMENT_ms)
   {
     _delay(CPU_READY_TIMEOUT_INCREMENT_ms);
-    if (_ctrl.isCpuReady())
+    if (_api.isCpuReady())
       return true;
   }
 
@@ -170,7 +170,7 @@ bool ArduinoTMF8801::waitForApplication()
   for (; t < APP_LOADED_TIMEOUT_ms; t += APP_LOADED_TIMEOUT_INCREMENT_ms)
   {
     _delay(APP_LOADED_TIMEOUT_INCREMENT_ms);
-    if (_ctrl.currentApplication() == TMF8801::Application::Measurement)
+    if (_api.currentApplication() == TMF8801::Application::Measurement)
       return true;
   }
 

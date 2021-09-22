@@ -9,7 +9,7 @@
  * INCLUDE
  **************************************************************************************/
 
-#include "TMF8801_Control.h"
+#include "TMF8801_Api.h"
 
 #include "TMF8801_Const.h"
 
@@ -30,7 +30,7 @@ static unsigned int constexpr TIMEOUT_INCREMENT_ms = 10;
  * CTOR/DTOR
  **************************************************************************************/
 
-TMF8801_Control::TMF8801_Control(TMF8801_Io & io)
+TMF8801_Api::TMF8801_Api(TMF8801_Io & io)
 : _io{io}
 {
 
@@ -40,22 +40,22 @@ TMF8801_Control::TMF8801_Control(TMF8801_Io & io)
  * PUBLIC MEMBER FUNCTIONS
  **************************************************************************************/
 
-void TMF8801_Control::reset()
+void TMF8801_Api::reset()
 {
   _io.modify(Register::ENABLE, bm(ENABLE::CPU_RESET), bm(ENABLE::CPU_RESET));
 }
 
-void TMF8801_Control::loadApplication()
+void TMF8801_Api::loadApplication()
 {
   _io.write(Register::APPREQID, to_integer(APPREQID::APP));
 }
 
-void TMF8801_Control::loadBootloader()
+void TMF8801_Api::loadBootloader()
 {
   _io.write(Register::APPREQID, to_integer(APPREQID::BOOTLOADER));
 }
 
-void TMF8801_Control::clearInterrupt(InterruptSource const src)
+void TMF8801_Api::clearInterrupt(InterruptSource const src)
 {
   if (src == InterruptSource::ObjectDectectionAvailable)
     _io.write(Register::INT_STATUS, bm(INT_STATUS::INT1));
@@ -63,7 +63,7 @@ void TMF8801_Control::clearInterrupt(InterruptSource const src)
     _io.write(Register::INT_STATUS, bm(INT_STATUS::INT2));
 }
 
-void TMF8801_Control::enableInterrupt(InterruptSource const src)
+void TMF8801_Api::enableInterrupt(InterruptSource const src)
 {
   if (src == InterruptSource::ObjectDectectionAvailable)
     _io.modify(Register::INT_ENAB, bm(INT_ENAB::INT1), bm(INT_ENAB::INT1));
@@ -71,7 +71,7 @@ void TMF8801_Control::enableInterrupt(InterruptSource const src)
     _io.modify(Register::INT_ENAB, bm(INT_ENAB::INT2), bm(INT_ENAB::INT2));
 }
 
-void TMF8801_Control::disableInterrupt(InterruptSource const src)
+void TMF8801_Api::disableInterrupt(InterruptSource const src)
 {
   if (src == InterruptSource::ObjectDectectionAvailable)
     _io.modify(Register::INT_ENAB, bm(INT_ENAB::INT1), 0);
@@ -79,27 +79,27 @@ void TMF8801_Control::disableInterrupt(InterruptSource const src)
     _io.modify(Register::INT_ENAB, bm(INT_ENAB::INT2), 0);
 }
 
-void TMF8801_Control::readObjectDetectionResult(ObjectDetectionData & data)
+void TMF8801_Api::readObjectDetectionResult(ObjectDetectionData & data)
 {
   _io.read(Register::RESULT_NUMBER, data.buf, sizeof(data.buf));
 }
 
-void TMF8801_Control::loadCalibData(CalibData const & calib_data)
+void TMF8801_Api::loadCalibData(CalibData const & calib_data)
 {
   _io.write(Register::FACTORY_CALIB_0, calib_data.data(), calib_data.size());
 }
 
-void TMF8801_Control::loadAlgoState(AlgoState const & algo_state)
+void TMF8801_Api::loadAlgoState(AlgoState const & algo_state)
 {
   _io.write(Register::STATE_DATA_WR_0, algo_state.data(), algo_state.size());
 }
 
-bool TMF8801_Control::isCpuReady()
+bool TMF8801_Api::isCpuReady()
 {
   return _io.isBitSet(Register::ENABLE, bp(ENABLE::CPU_READY));
 }
 
-Application TMF8801_Control::currentApplication()
+Application TMF8801_Api::currentApplication()
 {
   uint8_t const appid_val = _io.read(Register::APPID);
 
@@ -111,7 +111,7 @@ Application TMF8801_Control::currentApplication()
     return Application::Unknown;
 }
 
-RegisterContent TMF8801_Control::getRegisterContent()
+RegisterContent TMF8801_Api::getRegisterContent()
 {
   uint8_t const register_contents_val = _io.read(Register::REGISTER_CONTENTS);
 

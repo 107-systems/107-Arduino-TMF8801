@@ -5,8 +5,8 @@
  * Contributors: https://github.com/107-systems/107-Arduino-TMF8801/graphs/contributors.
  */
 
-#ifndef ARDUINO_TMF8801_TMF8801_CONTROL_H_
-#define ARDUINO_TMF8801_TMF8801_CONTROL_H_
+#ifndef ARDUINO_TMF8801_TMF8801_API_H_
+#define ARDUINO_TMF8801_TMF8801_API_H_
 
 /**************************************************************************************
  * INCLUDE
@@ -46,12 +46,12 @@ enum class RegisterContent
  * CLASS DECLARATION
  **************************************************************************************/
 
-class TMF8801_Control
+class TMF8801_Api
 {
 
 public:
 
-  TMF8801_Control(TMF8801_Io & io);
+  TMF8801_Api(TMF8801_Io & io);
 
 
   /* Control
