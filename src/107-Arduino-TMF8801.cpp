@@ -98,9 +98,12 @@ bool ArduinoTMF8801::begin(uint8_t const measurement_period_ms)
   Serial.print("STATUS = 0x");
   Serial.println(_io.read(TMF8801::Register::STATUS), HEX);
 
-  unit::Time const update_period = (static_cast<float>(measurement_period_ms) / 1000.0) * unit::second;
-  unit::Frequency const update_rate = 1.0 / update_period;
-  setUpdateRate(update_rate);
+  if(measurement_period_ms>0)
+  {
+    unit::Time const update_period = (static_cast<float>(measurement_period_ms) / 1000.0) * unit::second;
+    unit::Frequency const update_rate = 1.0 / update_period;
+    setUpdateRate(update_rate);
+  }
 
   return true;
 }
