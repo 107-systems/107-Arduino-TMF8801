@@ -82,7 +82,7 @@ bool ArduinoTMF8801::begin(uint8_t const measurement_period_ms)
 
   /* set gpio_control to Input for GPIO0 and GPIO1
    */
-  TMF8801::gpio_control=0x00;
+  gpio_control=0x00;
 
   /* Configure TMF8801 according to TMF8X0X Host Driver Communication:
    * Use above configuration and configure for continuous mode, period
@@ -91,7 +91,7 @@ bool ArduinoTMF8801::begin(uint8_t const measurement_period_ms)
    */
   _io.write(TMF8801::Register::CMD_DATA7, 0x03); /* Algorithm state and factory calibration is provided */
   _io.write(TMF8801::Register::CMD_DATA6, 0x23); /* Run proximity and distance algorithm and combine histograms for distance */
-  _io.write(TMF8801::Register::CMD_DATA5, TMF8801::gpio_control);
+  _io.write(TMF8801::Register::CMD_DATA5, gpio_control);
   _io.write(TMF8801::Register::CMD_DATA4, 0x00); /* No GPIO control used */
   _io.write(TMF8801::Register::CMD_DATA3, 0x00); /* Needs to be always 00 */
   _io.write(TMF8801::Register::CMD_DATA2, measurement_period_ms);
@@ -114,13 +114,13 @@ bool ArduinoTMF8801::begin(uint8_t const measurement_period_ms)
 
 void ArduinoTMF8801::set_gpio(uint8_t num, uint8_t val)
 {
-  if(num==0&&val==LOW)  TMF8801::gpio_control=((TMF8801::gpio_control)&0xF0)|0x04;
-  if(num==0&&val==HIGH) TMF8801::gpio_control=((TMF8801::gpio_control)&0xF0)|0x05;
-  if(num==1&&val==LOW)  TMF8801::gpio_control=((TMF8801::gpio_control)&0x0F)|0x40;
-  if(num==1&&val==HIGH) TMF8801::gpio_control=((TMF8801::gpio_control)&0x0F)|0x50;
+  if(num==0&&val==LOW)  gpio_control=((gpio_control)&0xF0)|0x04;
+  if(num==0&&val==HIGH) gpio_control=((gpio_control)&0xF0)|0x05;
+  if(num==1&&val==LOW)  gpio_control=((gpio_control)&0x0F)|0x40;
+  if(num==1&&val==HIGH) gpio_control=((gpio_control)&0x0F)|0x50;
   /* Set gpio control setting without actually performing a measurement as commands 0x02 or 0x03 would do
    */
-  _io.write(TMF8801::Register::CMD_DATA0, TMF8801::gpio_control);
+  _io.write(TMF8801::Register::CMD_DATA0, gpio_control);
   _io.write(TMF8801::Register::COMMAND,   TMF8801::to_integer(TMF8801::COMMAND::SET_GPIO_CONTROL_SETTING)); /* Set flag to set GPIO control setting */
 
   Serial.print("STATUS = 0x");
