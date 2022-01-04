@@ -55,6 +55,7 @@ public:
 
   bool begin(uint8_t const measurement_period_ms);
 
+  void stop_continuous_measurement();
 
   void onExternalEventHandler();
 

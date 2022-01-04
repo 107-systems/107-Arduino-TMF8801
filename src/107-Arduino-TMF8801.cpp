@@ -108,6 +108,14 @@ bool ArduinoTMF8801::begin(uint8_t const measurement_period_ms)
   return true;
 }
 
+void ArduinoTMF8801::stop_continuous_measurement()
+{
+  _io.write(TMF8801::Register::COMMAND,   TMF8801::to_integer(TMF8801::COMMAND::STOP_CONTINUOUS_MEASUREMENT)); /* Set flag to stop everything */
+
+  Serial.print("STATUS = 0x");
+  Serial.println(_io.read(TMF8801::Register::STATUS), HEX);
+}
+
 void ArduinoTMF8801::onExternalEventHandler()
 {
   /* Clear the interrupt flag. */

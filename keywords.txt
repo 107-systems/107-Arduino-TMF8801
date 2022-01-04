@@ -20,6 +20,7 @@ begin	KEYWORD2
 clearerr	KEYWORD2
 isDataReady	KEYWORD2
 onExternalEventHandler	KEYWORD2
+stop_continuous_measurement	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)

@@ -115,9 +115,12 @@ enum class ENABLE : uint8_t
 
 enum class COMMAND : uint8_t
 {
-  DISTANCE_MEASURE_MODE_1  = 0x02, /* Set flag to perform target distance measurement with 8 bytes of data containing where including setting of calibration (and algorithm state) configuration. */
-  FACTORY_CALIB            = 0x0A, /* Perform factory calibration in the final customer application including cover glass, no ambient light and no target. */
-  DOWNLOAD_CALIB_AND_STATE = 0x0B,
+  DISTANCE_MEASURE_MODE_1     = 0x02, /* Set flag to perform target distance measurement with 8 bytes of data containing where including setting of calibration (and algorithm state) configuration. */
+  FACTORY_CALIB               = 0x0A, /* Perform factory calibration in the final customer application including cover glass, no ambient light and no target. */
+  DOWNLOAD_CALIB_AND_STATE    = 0x0B,
+  SET_GPIO_CONTROL_SETTING    = 0x0F, /* Set gpio control setting without actually performing a measurement as commands 0x02 or 0x03 would do */
+  STOP_CONTINUOUS_MEASUREMENT = 0xFF, /* Stop whatever you are doing as soon as possible and reenter the idle
+state */
 };
 
 enum class STATUS : uint8_t
