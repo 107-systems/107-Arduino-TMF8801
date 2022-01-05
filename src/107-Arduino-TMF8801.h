@@ -55,7 +55,8 @@ public:
 
   bool begin(uint8_t const measurement_period_ms);
 
-  void set_gpio(uint8_t const num, uint8_t const val);
+  void set_gpio(TMF8801::GPIO const gpio);
+  void clr_gpio(TMF8801::GPIO const gpio);
   void stop_continuous_measurement();
 
   void onExternalEventHandler();

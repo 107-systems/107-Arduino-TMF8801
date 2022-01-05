@@ -111,12 +111,23 @@ bool ArduinoTMF8801::begin(uint8_t const measurement_period_ms)
   return true;
 }
 
-void ArduinoTMF8801::set_gpio(uint8_t num, uint8_t val)
+void ArduinoTMF8801::set_gpio(TMF8801::GPIO const gpio)
 {
-  if(num==0&&val==LOW)  _gpio_control=((_gpio_control)&0xF0)|0x04;
-  if(num==0&&val==HIGH) _gpio_control=((_gpio_control)&0xF0)|0x05;
-  if(num==1&&val==LOW)  _gpio_control=((_gpio_control)&0x0F)|0x40;
-  if(num==1&&val==HIGH) _gpio_control=((_gpio_control)&0x0F)|0x50;
+  if(gpio==TMF8801::GPIO::GPIO0) _gpio_control=((_gpio_control)&0xF0)|0x05;
+  if(gpio==TMF8801::GPIO::GPIO1) _gpio_control=((_gpio_control)&0x0F)|0x50;
+  /* Set gpio control setting without actually performing a measurement as commands 0x02 or 0x03 would do
+   */
+  _io.write(TMF8801::Register::CMD_DATA0, _gpio_control);
+  _io.write(TMF8801::Register::COMMAND,   TMF8801::to_integer(TMF8801::COMMAND::SET_GPIO_CONTROL_SETTING)); /* Set flag to set GPIO control setting */
+
+  Serial.print("STATUS = 0x");
+  Serial.println(_io.read(TMF8801::Register::STATUS), HEX);
+}
+
+void ArduinoTMF8801::clr_gpio(TMF8801::GPIO const gpio)
+{
+  if(gpio==TMF8801::GPIO::GPIO0) _gpio_control=((_gpio_control)&0xF0)|0x04;
+  if(gpio==TMF8801::GPIO::GPIO1) _gpio_control=((_gpio_control)&0x0F)|0x40;
   /* Set gpio control setting without actually performing a measurement as commands 0x02 or 0x03 would do
    */
   _io.write(TMF8801::Register::CMD_DATA0, _gpio_control);
