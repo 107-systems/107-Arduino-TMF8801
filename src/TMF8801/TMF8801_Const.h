@@ -35,7 +35,7 @@ enum class Register : uint8_t
   APPREV_MAJOR            = 0x01,
   APPREV_MINOR            = 0x12,
   APPREV_PATCH            = 0x13,
-
+  
   CMD_DATA9               = 0x06,
   CMD_DATA8               = 0x07,
   CMD_DATA7               = 0x08,
