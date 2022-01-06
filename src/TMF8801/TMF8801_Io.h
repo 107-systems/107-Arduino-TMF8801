@@ -49,6 +49,7 @@ public:
   void    write   (Register const reg, uint8_t const * buf, size_t const bytes);
   void    modify  (Register const reg, uint8_t const bitmask, uint8_t const val);
   bool    isBitSet(Register const reg, uint8_t const bitpos);
+  void    change_i2c_slace_addr (uint8_t const new_i2c_slave_addr);
 
 
 private:
@@ -56,7 +57,7 @@ private:
   I2cWriteFunc _write;
   I2cReadFunc _read;
 
-  uint8_t const _i2c_slave_addr;
+  uint8_t _i2c_slave_addr;
 };
 
 /**************************************************************************************

@@ -125,6 +125,7 @@ enum class COMMAND : uint8_t
   DOWNLOAD_CALIB_AND_STATE    = 0x0B,
   SET_GPIO_CONTROL_SETTING    = 0x0F, /* Set gpio control setting without actually performing a measurement as commands 0x02 or 0x03 would do */
   SERIAL_NUMBER_READOUT       = 0x47, /* Read out serial number  */
+  CHANGE_I2C_ADDRESS          = 0x49, /* Change the I2C address of TMF8801  */
   STOP_CONTINUOUS_MEASUREMENT = 0xFF, /* Stop whatever you are doing as soon as possible and reenter the idle
 state */
 };
