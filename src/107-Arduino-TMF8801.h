@@ -77,7 +77,6 @@ private:
   TMF8801::CalibData const & _calib_data;
   TMF8801::AlgoState const & _algo_state;
   unit::Length _distance;
-
   uint8_t _gpio_control;
 
 };

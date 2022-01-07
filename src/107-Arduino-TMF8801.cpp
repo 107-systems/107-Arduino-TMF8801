@@ -41,11 +41,8 @@ ArduinoTMF8801::ArduinoTMF8801(TMF8801::I2cWriteFunc write,
 , _api{_io, delay}
 , _calib_data{calib_data}
 , _algo_state{algo_state}
+, _gpio_control{0}
 {
-  /* set gpio_control to Input for GPIO0 and GPIO1
-   */
-  _gpio_control=0x00;
-
 }
 
 /**************************************************************************************
