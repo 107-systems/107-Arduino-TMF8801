@@ -59,6 +59,7 @@ public:
   void     set_gpio(TMF8801::GPIO const gpio);
   void     clr_gpio(TMF8801::GPIO const gpio);
   void     stop_continuous_measurement();
+  void     change_i2c_address(uint8_t const new_address);
 
   void onExternalEventHandler();
 

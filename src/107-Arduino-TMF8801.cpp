@@ -140,6 +140,17 @@ void ArduinoTMF8801::stop_continuous_measurement()
   _io.write(TMF8801::Register::COMMAND,   TMF8801::to_integer(TMF8801::COMMAND::STOP_CONTINUOUS_MEASUREMENT)); /* Set flag to stop everything */
 }
 
+void ArduinoTMF8801::change_i2c_address(uint8_t const new_address)
+{
+  uint8_t new_address_buf = (new_address & 0x7F) << 1;    /* Shift one bit */
+  new_address_buf = new_address_buf & 0xFE;               /* Set Bit 0 to 0 */
+  _io.write(TMF8801::Register::CMD_DATA1, new_address_buf);
+  _io.write(TMF8801::Register::CMD_DATA0, 0x00);          /* Needs to be always 0 */
+  _io.write(TMF8801::Register::COMMAND,   TMF8801::to_integer(TMF8801::COMMAND::CHANGE_I2C_ADDRESS)); /* Set flag to change i2c address */
+
+  _io.set_i2c_slace_addr(new_address);
+}
+
 void ArduinoTMF8801::onExternalEventHandler()
 {
   /* Clear the interrupt flag. */
