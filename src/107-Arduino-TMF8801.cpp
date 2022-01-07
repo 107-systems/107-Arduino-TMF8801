@@ -149,7 +149,7 @@ void ArduinoTMF8801::change_i2c_address(uint8_t const new_address)
   _io.write(TMF8801::Register::CMD_DATA0, 0x00); /* Needs to be always 00 */
   _io.write(TMF8801::Register::COMMAND,   TMF8801::to_integer(TMF8801::COMMAND::CHANGE_I2C_ADDRESS)); /* Set flag to change i2c address */
 
-  _io.change_i2c_slace_addr(new_address);
+  _io.set_i2c_slace_addr(new_address);
 }
 
 void ArduinoTMF8801::onExternalEventHandler()

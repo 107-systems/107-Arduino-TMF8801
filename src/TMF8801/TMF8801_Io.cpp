@@ -72,10 +72,6 @@ bool TMF8801_Io::isBitSet(Register const reg, uint8_t const bitpos)
   else
     return false;
 }
-void TMF8801_Io::change_i2c_slace_addr (uint8_t const new_i2c_slave_addr)
-{
-  _i2c_slave_addr = new_i2c_slave_addr;
-}
 
 /**************************************************************************************
  * NAMESPACE
