@@ -55,6 +55,9 @@ public:
 
   bool begin(uint8_t const measurement_period_ms);
 
+  void set_gpio(TMF8801::GPIO const gpio);
+  void clr_gpio(TMF8801::GPIO const gpio);
+  void stop_continuous_measurement();
 
   void onExternalEventHandler();
 
@@ -74,6 +77,7 @@ private:
   TMF8801::CalibData const & _calib_data;
   TMF8801::AlgoState const & _algo_state;
   unit::Length _distance;
+  uint8_t _gpio_control;
 
 };
 
