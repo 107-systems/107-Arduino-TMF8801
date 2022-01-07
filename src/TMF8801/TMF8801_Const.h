@@ -200,6 +200,7 @@ enum class Error : int
   None    =  0,
   Timeout = -1,
   ChipId  = -2,
+  Param   = -3,
 };
 
 enum class GPIO : uint8_t

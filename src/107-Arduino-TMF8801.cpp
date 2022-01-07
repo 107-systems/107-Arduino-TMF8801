@@ -95,14 +95,16 @@ bool ArduinoTMF8801::begin(uint8_t const measurement_period_ms)
   _io.write(TMF8801::Register::CMD_DATA0, 0xFF); /* Needs to be always ff */
   _io.write(TMF8801::Register::COMMAND,   TMF8801::to_integer(TMF8801::COMMAND::DISTANCE_MEASURE_MODE_1)); /* Set flag to perform target distance measurement with 8 bytes of data containing where including setting of calibration (and algorithm state) configuration. */
 
-  if(measurement_period_ms>0)
+  if(measurement_period_ms > 0)
   {
     unit::Time const update_period = (static_cast<float>(measurement_period_ms) / 1000.0) * unit::second;
     unit::Frequency const update_rate = 1.0 / update_period;
     setUpdateRate(update_rate);
+    return true;
   }
 
-  return true;
+  _error = TMF8801::Error::Param;
+  return false;
 }
 
 void ArduinoTMF8801::set_gpio(TMF8801::GPIO const gpio)
