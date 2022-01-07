@@ -107,17 +107,11 @@ bool ArduinoTMF8801::begin(uint8_t const measurement_period_ms)
   return false;
 }
 
-uint32_t ArduinoTMF8801::read_serial_number(void)
+uint32_t ArduinoTMF8801::read_serial_number()
 {
-  uint32_t serial_number = 0;
-
   _io.write(TMF8801::Register::COMMAND, TMF8801::to_integer(TMF8801::COMMAND::SERIAL_NUMBER_READOUT));
   delay(5);
-  _api.application_read_serial_number(serial_number);
-
-  Serial.print("STATUS = 0x");
-  Serial.println(_io.read(TMF8801::Register::STATUS), HEX);
-
+  uint32_t const serial_number = _api.application_read_serial_number();
   return serial_number;
 }
 

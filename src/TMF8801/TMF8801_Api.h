@@ -72,10 +72,10 @@ public:
 
   /* Application API
    */
-  void application_readObjectDetectionResult(ObjectDetectionData & data);
-  void application_loadCalibData(CalibData const & calib_data);
-  void application_loadAlgoState(AlgoState const & algo_state);
-  void application_read_serial_number(uint32_t const & serial_number);
+  void     application_readObjectDetectionResult(ObjectDetectionData & data);
+  void     application_loadCalibData(CalibData const & calib_data);
+  void     application_loadAlgoState(AlgoState const & algo_state);
+  uint32_t application_read_serial_number();
 
 
   /* Bootloader API

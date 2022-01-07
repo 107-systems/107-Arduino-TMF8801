@@ -55,10 +55,10 @@ public:
 
   bool begin(uint8_t const measurement_period_ms);
 
-  uint32_t read_serial_number(void);
-  void set_gpio(TMF8801::GPIO const gpio);
-  void clr_gpio(TMF8801::GPIO const gpio);
-  void stop_continuous_measurement();
+  uint32_t read_serial_number();
+  void     set_gpio(TMF8801::GPIO const gpio);
+  void     clr_gpio(TMF8801::GPIO const gpio);
+  void     stop_continuous_measurement();
 
   void onExternalEventHandler();
 
