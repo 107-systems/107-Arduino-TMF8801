@@ -23,6 +23,7 @@ onExternalEventHandler	KEYWORD2
 stop_continuous_measurement	KEYWORD2
 set_gpio	KEYWORD2
 clr_gpio	KEYWORD2
+change_i2c_address	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
