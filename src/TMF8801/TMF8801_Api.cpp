@@ -170,6 +170,13 @@ void TMF8801_Api::application_loadAlgoState(AlgoState const & algo_state)
   _io.write(Register::STATE_DATA_WR_0, algo_state.data(), algo_state.size());
 }
 
+uint32_t TMF8801_Api::application_read_serial_number()
+{
+  uint32_t serial_number = 0;
+  _io.read(Register::SERIAL_NUMBER_0, reinterpret_cast<uint8_t *>(&serial_number), sizeof(serial_number));
+  return serial_number;
+}
+
 BOOTLOADER_STATUS TMF8801_Api::bootloader_download_init()
 {
   BootloaderCommand download_init;

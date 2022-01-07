@@ -107,6 +107,14 @@ bool ArduinoTMF8801::begin(uint8_t const measurement_period_ms)
   return false;
 }
 
+uint32_t ArduinoTMF8801::read_serial_number()
+{
+  _io.write(TMF8801::Register::COMMAND, TMF8801::to_integer(TMF8801::COMMAND::SERIAL_NUMBER_READOUT));
+  delay(5);
+  uint32_t const serial_number = _api.application_read_serial_number();
+  return serial_number;
+}
+
 void ArduinoTMF8801::set_gpio(TMF8801::GPIO const gpio)
 {
   if(gpio==TMF8801::GPIO::GPIO0) _gpio_control=((_gpio_control)&0xF0)|0x05;
