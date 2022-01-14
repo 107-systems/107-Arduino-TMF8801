@@ -176,6 +176,52 @@ bool ArduinoTMF8801::update_available()
   else return false;
 }
 
+bool ArduinoTMF8801::perform_update()
+{
+  /* Load bootloader stored in ROM firmware.
+   */
+  if ((_error = _api.loadBootloader()) != TMF8801::Error::None)
+  {
+//    DBG_ERROR("loadBootloader() failed with %d", to_integer(error));
+    return false;
+  }
+
+
+  /* Download RAM firmware to TMF8801.
+   */
+  TMF8801::BOOTLOADER_STATUS bl_status = TMF8801::BOOTLOADER_STATUS::READY;
+
+//  DBG_INFO("bootloader_download_init() ...");
+  if ((bl_status = _api.bootloader_download_init()) != TMF8801::BOOTLOADER_STATUS::READY)
+  {
+//    DBG_ERROR("bootloader_download_init() failed with %d", to_integer(bl_status));
+    return false;
+  }
+
+//  DBG_INFO("bootloader_set_address() ...");
+  if ((bl_status = _api.bootloader_set_address(0x0000)) != TMF8801::BOOTLOADER_STATUS::READY)
+  {
+//    DBG_ERROR("bootloader_set_address() failed with %d", to_integer(bl_status));
+    return false;
+  }
+
+//  DBG_INFO("bootloader_write_ram() ...");
+  if ((bl_status = _api.bootloader_write_ram(TMF8801::main_app_3v3_k2_bin, sizeof(TMF8801::main_app_3v3_k2_bin))) != TMF8801::BOOTLOADER_STATUS::READY)
+  {
+//    DBG_ERROR("bootloader_write_ram() failed with %d", to_integer(bl_status));
+    return false;
+  }
+
+//  DBG_INFO("bootloader_ramremap_reset() ...");
+  if ((bl_status = _api.bootloader_ramremap_reset()) != TMF8801::BOOTLOADER_STATUS::READY)
+  {
+//    DBG_ERROR("bootloader_ramremap_reset() failed with %d", to_integer(bl_status));
+    return false;
+  }
+
+  return true;
+}
+
 void ArduinoTMF8801::onExternalEventHandler()
 {
   /* Clear the interrupt flag. */

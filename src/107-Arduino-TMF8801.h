@@ -62,6 +62,7 @@ public:
   void     stop_continuous_measurement();
   void     change_i2c_address(uint8_t const new_address);
   bool     update_available();
+  bool     perform_update();
 
   void onExternalEventHandler();
 
