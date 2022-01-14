@@ -61,6 +61,7 @@ public:
   bool     start_continuous_measurement(uint8_t const measurement_period_ms);
   void     stop_continuous_measurement();
   void     change_i2c_address(uint8_t const new_address);
+  bool     update_available();
 
   void onExternalEventHandler();
 
