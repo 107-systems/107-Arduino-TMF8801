@@ -64,6 +64,11 @@ bool ArduinoTMF8801::begin(uint8_t const measurement_period_ms)
     return false;
   }
 
+  return start_continuous_measurement(measurement_period_ms);
+}
+
+bool ArduinoTMF8801::start_continuous_measurement(uint8_t const measurement_period_ms)
+{
   /* Load the measurement application and verify if the
    * measurement application has been successfully loaded.
    */

@@ -58,6 +58,7 @@ public:
   uint32_t read_serial_number();
   void     set_gpio(TMF8801::GPIO const gpio);
   void     clr_gpio(TMF8801::GPIO const gpio);
+  bool     start_continuous_measurement(uint8_t const measurement_period_ms);
   void     stop_continuous_measurement();
   void     change_i2c_address(uint8_t const new_address);
 
