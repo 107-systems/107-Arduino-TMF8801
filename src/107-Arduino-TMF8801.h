@@ -64,6 +64,8 @@ public:
   void onExternalEventHandler();
 
 
+  bool isDataReady();
+  unit::Length getDistance();
   virtual void get(unit::Length & distance) override;
 
 

@@ -170,6 +170,24 @@ void ArduinoTMF8801::get(unit::Length & distance)
   distance = _distance;
 }
 
+bool ArduinoTMF8801::isDataReady()
+{
+  return (_api.getRegisterContent() == TMF8801::RegisterContent::CommandResult);
+}
+
+unit::Length ArduinoTMF8801::getDistance()
+{
+  /* Clear the interrupt flag. */
+  _api.clearInterrupt(TMF8801::InterruptSource::ObjectDectectionAvailable);
+
+  /* Obtain distance data. */
+  TMF8801::ObjectDetectionData data;
+  _api.application_readObjectDetectionResult(data);
+  return (data.field.distance_peak_0_mm / 1000.0) * unit::meter;
+}
+
+
+
 void ArduinoTMF8801::clearerr()
 {
   _error = TMF8801::Error::None;
