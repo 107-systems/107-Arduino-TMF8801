@@ -42,6 +42,7 @@ ArduinoTMF8801::ArduinoTMF8801(TMF8801::I2cWriteFunc write,
 , _calib_data{calib_data}
 , _algo_state{algo_state}
 , _gpio_control{0}
+, _old_tid{0}
 {
 }
 
@@ -172,7 +173,18 @@ void ArduinoTMF8801::get(unit::Length & distance)
 
 bool ArduinoTMF8801::isDataReady()
 {
-  return (_api.getRegisterContent() == TMF8801::RegisterContent::CommandResult);
+  uint8_t tid=_io.read(TMF8801::Register::TID);
+  if(tid>_old_tid||(tid==0&&_old_tid==255))
+  {
+    if(_api.getRegisterContent() == TMF8801::RegisterContent::CommandResult)
+    {
+      _old_tid=tid;
+      return true;
+    }
+    else return false;
+  }
+  else return false;
+
 }
 
 unit::Length ArduinoTMF8801::getDistance()

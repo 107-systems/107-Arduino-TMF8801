@@ -82,6 +82,7 @@ private:
   TMF8801::AlgoState const & _algo_state;
   unit::Length _distance;
   uint8_t _gpio_control;
+  uint8_t _old_tid;
 
 };
 
