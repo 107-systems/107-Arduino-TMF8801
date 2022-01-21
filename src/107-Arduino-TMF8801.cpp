@@ -64,6 +64,17 @@ bool ArduinoTMF8801::begin(uint8_t const measurement_period_ms)
     return false;
   }
 
+  /* Check if a firmware update is available.
+   */
+  if (update_available())
+  {
+    /* If this is the case perform a firmware update
+     * to upload the latest RAM firmware to the TMF8801.
+     */
+    if (!perform_update())
+      return false;
+  }
+
   return start_continuous_measurement(measurement_period_ms);
 }
 
