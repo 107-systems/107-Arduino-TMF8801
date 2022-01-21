@@ -177,26 +177,29 @@ bool ArduinoTMF8801::update_available()
 bool ArduinoTMF8801::perform_update()
 {
   /* Load bootloader stored in ROM firmware. */
-  if ((_error = _api.loadBootloader()) != TMF8801::Error::None) {
+  if ((_error = _api.loadBootloader()) != TMF8801::Error::None)
     return false;
-  }
 
   TMF8801::BOOTLOADER_STATUS bl_status = TMF8801::BOOTLOADER_STATUS::READY;
 
   /* Download RAM firmware to TMF8801. */
   if ((bl_status = _api.bootloader_download_init()) != TMF8801::BOOTLOADER_STATUS::READY) {
+    _error = TMF8801::Error::Bootloader_Download_Init;
     return false;
   }
 
   if ((bl_status = _api.bootloader_set_address(0x0000)) != TMF8801::BOOTLOADER_STATUS::READY) {
+    _error = TMF8801::Error::Bootloader_Set_Address;
     return false;
   }
 
   if ((bl_status = _api.bootloader_write_ram(TMF8801::main_app_3v3_k2_bin, sizeof(TMF8801::main_app_3v3_k2_bin))) != TMF8801::BOOTLOADER_STATUS::READY) {
+    _error = TMF8801::Error::Bootloader_Write_Ram;
     return false;
   }
 
   if ((bl_status = _api.bootloader_ramremap_reset()) != TMF8801::BOOTLOADER_STATUS::READY) {
+    _error = TMF8801::Error::Bootloader_Ramremap_Reset;
     return false;
   }
 
