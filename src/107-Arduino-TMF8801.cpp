@@ -167,6 +167,35 @@ void ArduinoTMF8801::change_i2c_address(uint8_t const new_address)
   _io.set_i2c_slace_addr(new_address);
 }
 
+void ArduinoTMF8801::onExternalEventHandler()
+{
+  /* Clear the interrupt flag. */
+  _api.clearInterrupt(TMF8801::InterruptSource::ObjectDectectionAvailable);
+
+  /* Obtain distance data. */
+  TMF8801::ObjectDetectionData data;
+  _api.application_readObjectDetectionResult(data);
+  _distance = (data.field.distance_peak_0_mm / 1000.0) * unit::meter;
+
+  /* Invoke new ensor data update callback. */
+  onSensorValueUpdate(_distance);
+}
+
+void ArduinoTMF8801::get(unit::Length & distance)
+{
+  distance = _distance;
+}
+
+void ArduinoTMF8801::clearerr()
+{
+  _error = TMF8801::Error::None;
+}
+
+TMF8801::Error ArduinoTMF8801::error()
+{
+  return _error;
+}
+
 bool ArduinoTMF8801::update_available()
 {
   /* Check for firmware 3.0.18 */
@@ -184,6 +213,10 @@ bool ArduinoTMF8801::update_available()
 
   return false;
 }
+
+/**************************************************************************************
+ * PRIVATE MEMBER FUNCTIONS
+ **************************************************************************************/
 
 bool ArduinoTMF8801::perform_update()
 {
@@ -215,35 +248,6 @@ bool ArduinoTMF8801::perform_update()
   }
 
   return true;
-}
-
-void ArduinoTMF8801::onExternalEventHandler()
-{
-  /* Clear the interrupt flag. */
-  _api.clearInterrupt(TMF8801::InterruptSource::ObjectDectectionAvailable);
-
-  /* Obtain distance data. */
-  TMF8801::ObjectDetectionData data;
-  _api.application_readObjectDetectionResult(data);
-  _distance = (data.field.distance_peak_0_mm / 1000.0) * unit::meter;
-
-  /* Invoke new ensor data update callback. */
-  onSensorValueUpdate(_distance);
-}
-
-void ArduinoTMF8801::get(unit::Length & distance)
-{
-  distance = _distance;
-}
-
-void ArduinoTMF8801::clearerr()
-{
-  _error = TMF8801::Error::None;
-}
-
-TMF8801::Error ArduinoTMF8801::error()
-{
-  return _error;
 }
 
 /**************************************************************************************
