@@ -71,7 +71,7 @@ bool ArduinoTMF8801::begin(uint8_t const measurement_period_ms)
     /* If this is the case perform a firmware update
      * to upload the latest RAM firmware to the TMF8801.
      */
-    if (!perform_update())
+    if (!perform_update(TMF8801::main_app_3v3_k2_bin, sizeof(TMF8801::main_app_3v3_k2_bin)))
       return false;
   }
 
@@ -218,7 +218,7 @@ bool ArduinoTMF8801::update_available()
  * PRIVATE MEMBER FUNCTIONS
  **************************************************************************************/
 
-bool ArduinoTMF8801::perform_update()
+bool ArduinoTMF8801::perform_update(uint8_t const * ram_firmware, size_t const ram_firmware_bytes)
 {
   /* Load bootloader stored in ROM firmware. */
   if ((_error = _api.loadBootloader()) != TMF8801::Error::None)
@@ -237,7 +237,7 @@ bool ArduinoTMF8801::perform_update()
     return false;
   }
 
-  if ((bl_status = _api.bootloader_write_ram(TMF8801::main_app_3v3_k2_bin, sizeof(TMF8801::main_app_3v3_k2_bin))) != TMF8801::BOOTLOADER_STATUS::READY) {
+  if ((bl_status = _api.bootloader_write_ram(ram_firmware, ram_firmware_bytes)) != TMF8801::BOOTLOADER_STATUS::READY) {
     _error = TMF8801::Error::Bootloader_Write_Ram;
     return false;
   }

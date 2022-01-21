@@ -83,7 +83,7 @@ private:
   uint8_t _gpio_control;
 
   bool update_available();
-  bool perform_update();
+  bool perform_update(uint8_t const * ram_firmware, size_t const ram_firmware_bytes);
 };
 
 /**************************************************************************************
