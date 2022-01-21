@@ -158,22 +158,20 @@ void ArduinoTMF8801::change_i2c_address(uint8_t const new_address)
 
 bool ArduinoTMF8801::update_available()
 {
-  /* check for firmware 3.0.18 */
-  uint8_t revMajor=_api.getAppRevisionMajor();
-  uint8_t revMinor=_api.getAppRevisionMinor();
-  uint8_t revPatch=_api.getAppRevisionPatch();
+  /* Check for firmware 3.0.18 */
+  uint8_t const rev_major = _api.getAppRevisionMajor();
+  uint8_t const rev_minor = _api.getAppRevisionMinor();
+  uint8_t const rev_patch = _api.getAppRevisionPatch();
 
-  if(revMajor<3) return true;
-  else if(revMajor==3)
-  {
-    if(revMinor==0)
-    {
-      if(revPatch<18) return true;
-      else return false;
-    }
-    else return false;
+  if(rev_major < 3)
+    return true;
+
+  if(rev_minor <= 0) {
+    if(rev_patch < 18)
+      return true;
   }
-  else return false;
+
+  return false;
 }
 
 bool ArduinoTMF8801::perform_update()
