@@ -64,6 +64,22 @@ bool ArduinoTMF8801::begin(uint8_t const measurement_period_ms)
     return false;
   }
 
+  /* Check if a firmware update is available.
+   */
+  if (update_available())
+  {
+    /* If this is the case perform a firmware update
+     * to upload the latest RAM firmware to the TMF8801.
+     */
+    if (!perform_update(TMF8801::main_app_3v3_k2_bin, sizeof(TMF8801::main_app_3v3_k2_bin)))
+      return false;
+  }
+
+  return start_continuous_measurement(measurement_period_ms);
+}
+
+bool ArduinoTMF8801::start_continuous_measurement(uint8_t const measurement_period_ms)
+{
   /* Load the measurement application and verify if the
    * measurement application has been successfully loaded.
    */
@@ -178,6 +194,60 @@ void ArduinoTMF8801::clearerr()
 TMF8801::Error ArduinoTMF8801::error()
 {
   return _error;
+}
+
+bool ArduinoTMF8801::update_available()
+{
+  /* Check for firmware 3.0.18 */
+  uint8_t const rev_major = _api.getAppRevisionMajor();
+  uint8_t const rev_minor = _api.getAppRevisionMinor();
+  uint8_t const rev_patch = _api.getAppRevisionPatch();
+
+  if(rev_major < 3)
+    return true;
+
+  if(rev_minor <= 0) {
+    if(rev_patch < 18)
+      return true;
+  }
+
+  return false;
+}
+
+/**************************************************************************************
+ * PRIVATE MEMBER FUNCTIONS
+ **************************************************************************************/
+
+bool ArduinoTMF8801::perform_update(uint8_t const * ram_firmware, size_t const ram_firmware_bytes)
+{
+  /* Load bootloader stored in ROM firmware. */
+  if ((_error = _api.loadBootloader()) != TMF8801::Error::None)
+    return false;
+
+  TMF8801::BOOTLOADER_STATUS bl_status = TMF8801::BOOTLOADER_STATUS::READY;
+
+  /* Download RAM firmware to TMF8801. */
+  if ((bl_status = _api.bootloader_download_init()) != TMF8801::BOOTLOADER_STATUS::READY) {
+    _error = TMF8801::Error::Bootloader_Download_Init;
+    return false;
+  }
+
+  if ((bl_status = _api.bootloader_set_address(0x0000)) != TMF8801::BOOTLOADER_STATUS::READY) {
+    _error = TMF8801::Error::Bootloader_Set_Address;
+    return false;
+  }
+
+  if ((bl_status = _api.bootloader_write_ram(ram_firmware, ram_firmware_bytes)) != TMF8801::BOOTLOADER_STATUS::READY) {
+    _error = TMF8801::Error::Bootloader_Write_Ram;
+    return false;
+  }
+
+  if ((bl_status = _api.bootloader_ramremap_reset()) != TMF8801::BOOTLOADER_STATUS::READY) {
+    _error = TMF8801::Error::Bootloader_Ramremap_Reset;
+    return false;
+  }
+
+  return true;
 }
 
 /**************************************************************************************

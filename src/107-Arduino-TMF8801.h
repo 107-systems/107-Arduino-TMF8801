@@ -58,6 +58,7 @@ public:
   uint32_t read_serial_number();
   void     set_gpio(TMF8801::GPIO const gpio);
   void     clr_gpio(TMF8801::GPIO const gpio);
+  bool     start_continuous_measurement(uint8_t const measurement_period_ms);
   void     stop_continuous_measurement();
   void     change_i2c_address(uint8_t const new_address);
 
@@ -81,6 +82,8 @@ private:
   unit::Length _distance;
   uint8_t _gpio_control;
 
+  bool update_available();
+  bool perform_update(uint8_t const * ram_firmware, size_t const ram_firmware_bytes);
 };
 
 /**************************************************************************************
