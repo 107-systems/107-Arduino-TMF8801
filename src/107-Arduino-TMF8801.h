@@ -65,6 +65,8 @@ public:
   void onExternalEventHandler();
 
 
+  bool isDataReady();
+  unit::Length getDistance();
   virtual void get(unit::Length & distance) override;
 
 
@@ -81,6 +83,7 @@ private:
   TMF8801::AlgoState const & _algo_state;
   unit::Length _distance;
   uint8_t _gpio_control;
+  uint8_t _old_tid;
 
   bool update_available();
   bool perform_update(uint8_t const * ram_firmware, size_t const ram_firmware_bytes);

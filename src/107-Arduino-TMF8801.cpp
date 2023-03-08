@@ -42,6 +42,7 @@ ArduinoTMF8801::ArduinoTMF8801(TMF8801::I2cWriteFunc write,
 , _calib_data{calib_data}
 , _algo_state{algo_state}
 , _gpio_control{0}
+, _old_tid{0}
 {
 }
 
@@ -184,6 +185,32 @@ void ArduinoTMF8801::onExternalEventHandler()
 void ArduinoTMF8801::get(unit::Length & distance)
 {
   distance = _distance;
+}
+
+bool ArduinoTMF8801::isDataReady()
+{
+  uint8_t const tid = _io.read(TMF8801::Register::TID);
+
+  if ((tid >_old_tid) || ((tid == 0) && (_old_tid == 255)))
+  {
+    if(_api.getRegisterContent() != TMF8801::RegisterContent::CommandResult)
+      return false;
+
+    _old_tid = tid;
+    return true;
+  }
+  return false;
+}
+
+unit::Length ArduinoTMF8801::getDistance()
+{
+  /* Clear the interrupt flag. */
+  _api.clearInterrupt(TMF8801::InterruptSource::ObjectDectectionAvailable);
+
+  /* Obtain distance data. */
+  TMF8801::ObjectDetectionData data;
+  _api.application_readObjectDetectionResult(data);
+  return (data.field.distance_peak_0_mm / 1000.0) * unit::meter;
 }
 
 void ArduinoTMF8801::clearerr()
