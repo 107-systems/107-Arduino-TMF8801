@@ -204,10 +204,14 @@ enum class BOOTLOADER_STATUS : uint8_t
 
 enum class Error : int
 {
-  None    =  0,
-  Timeout = -1,
-  ChipId  = -2,
-  Param   = -3,
+  None                      =  0,
+  Timeout                   = -1,
+  ChipId                    = -2,
+  Param                     = -3,
+  Bootloader_Download_Init  = -4,
+  Bootloader_Set_Address    = -5,
+  Bootloader_Write_Ram      = -6,
+  Bootloader_Ramremap_Reset = -7,
 };
 
 enum class GPIO : uint8_t

@@ -16,7 +16,7 @@
 #define DBG_ENABLE_INFO
 #define DBG_ENABLE_DEBUG
 #define DBG_ENABLE_VERBOSE
-#include <ArduinoDebug.hpp>
+#include <107-Arduino-Debug.hpp>
 
 /**************************************************************************************
  * NAMESPACE
