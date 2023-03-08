@@ -12,7 +12,7 @@
   <a href="https://github.com/107-systems/viper"><img src="https://github.com/107-systems/.github/raw/main/logo/viper.jpg" width="40%"></a>
 </p>
 
-Arduino library for the [AMS](https://ams.com) [TMF8801](https://ams.com/tmf8801) time-of-flight sensor.
+Arduino library for the [AMS](https://ams.com) [TMF8801](https://ams.com/tmf8801), [TMF8701](https://ams.com/tmf8701) and [TMF8805](https://ams.com/tmf8805) time-of-flight sensors.
 
 This library works for
 * [ArduinoCore-samd](https://github.com/arduino/ArduinoCore-samd): [`Arduino Zero`](https://store.arduino.cc/arduino-zero), [`MKR 1000`](https://store.arduino.cc/arduino-mkr1000-wifi), [`MKR WiFi 1010`](https://store.arduino.cc/arduino-mkr-wifi-1010), [`Nano 33 IoT`](https://store.arduino.cc/arduino-nano-33-iot), [`MKR GSM 1400`](https://store.arduino.cc/arduino-mkr-gsm-1400-1415), [`MKR NB 1500`](https://store.arduino.cc/arduino-mkr-nb-1500-1413), [`MKR WAN 1300/1310`](https://store.arduino.cc/mkr-wan-1310) :heavy_check_mark:
